@@ -57,19 +57,19 @@ class OnboardActivity : ComponentActivity() {
         val mContext = LocalContext.current
         val sharedPreferences = this.getSharedPreferences("shared", Context.MODE_PRIVATE)
 
-        val images = listOf(
+        val imageArray = listOf(
             R.drawable.onboard_image_1,
             R.drawable.onboard_image_2,
-            R.drawable.onboard_image_3,
+            R.drawable.onboard_image_3
         )
         
-        var buttonText by  rememberSaveable { mutableStateOf("Пропустить") }
+        var skipButtonText by rememberSaveable { mutableStateOf("Пропустить") }
 
         val pagerState = rememberPagerState()
 
         LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.collect() {
-                buttonText = if (it == 2) {
+            snapshotFlow { pagerState.currentPage }.collect {
+                skipButtonText = if (it == 2) {
                     "Завершить"
                 } else {
                     "Пропустить"
@@ -84,14 +84,14 @@ class OnboardActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(start = 30.dp)
             ) {
-                AppTextButton(text = buttonText) {
+                AppTextButton(text = skipButtonText) {
                     with(sharedPreferences.edit()) {
                         putBoolean("isFirstEnter", false)
                         apply()
                     }
                     
-                    val intent = Intent(mContext, LoginActivity::class.java)
-                    startActivity(intent)
+                    val loginIntent = Intent(mContext, LoginActivity::class.java)
+                    startActivity(loginIntent)
                 }
                 Image(
                     painter = painterResource(id = R.drawable.onboard_logo),
@@ -195,7 +195,7 @@ class OnboardActivity : ComponentActivity() {
             Column(modifier = Modifier.align(Alignment.BottomCenter).padding(vertical = 60.dp)) {
                 Spacer(modifier = Modifier.height(60.dp))
                 Image(
-                    painter = painterResource(id = images[pagerState.currentPage]),
+                    painter = painterResource(id = imageArray[pagerState.currentPage]),
                     contentDescription = "",
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier.align(Alignment.CenterHorizontally).height(250.dp)
