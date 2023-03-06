@@ -1,4 +1,4 @@
-package com.example.medicmad2
+package com.example.medicmad2.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.medicmad2.ui.theme.MedicMAD2Theme
 
@@ -19,7 +20,7 @@ class LoginActivity : ComponentActivity() {
         setContent {
             MedicMAD2Theme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().testTag("login"),
                     color = MaterialTheme.colors.background
                 ) {
                     LoginContent()

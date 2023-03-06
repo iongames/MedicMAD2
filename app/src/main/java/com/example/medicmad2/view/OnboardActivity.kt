@@ -1,4 +1,4 @@
-package com.example.medicmad2
+package com.example.medicmad2.view
 
 import android.content.Context
 import android.content.Intent
@@ -19,11 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.medicmad2.R
 import com.example.medicmad2.ui.components.AppTextButton
 import com.example.medicmad2.ui.theme.MedicMAD2Theme
 import com.example.medicmad2.ui.theme.descriptionColor
@@ -32,8 +35,6 @@ import com.example.medicmad2.ui.theme.secondaryColor
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 class OnboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,7 +80,9 @@ class OnboardActivity : ComponentActivity() {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 30.dp)
             ) {
                 AppTextButton(text = buttonText) {
                     with(sharedPreferences.edit()) {
@@ -98,24 +101,67 @@ class OnboardActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(60.dp))
             HorizontalPager(
                 count = 3,
-                state = pagerState
+                state = pagerState,
+                modifier = Modifier.testTag("pager")
             ) { index ->
                 when (index) {
                     0 -> {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.widthIn(max = 220.dp)
+                            modifier = Modifier.widthIn(max = 230.dp)
                         ) {
                             Text(
                                 text = "Анализы",
                                 fontSize = 20.sp,
-                                color = onboardTitleColor
+                                color = onboardTitleColor,
+                                textAlign = TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(30.dp))
                             Text(
                                 text = "Экспресс сбор и получение проб",
                                 fontSize = 14.sp,
-                                color = descriptionColor
+                                color = descriptionColor,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    1 -> {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.widthIn(max = 230.dp)
+                        ) {
+                            Text(
+                                text = "Уведомления",
+                                fontSize = 20.sp,
+                                color = onboardTitleColor,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(30.dp))
+                            Text(
+                                text = "Вы быстро узнаете о результатах",
+                                fontSize = 14.sp,
+                                color = descriptionColor,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    2 -> {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.widthIn(max = 230.dp)
+                        ) {
+                            Text(
+                                text = "Мониторинг",
+                                fontSize = 20.sp,
+                                color = onboardTitleColor,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(30.dp))
+                            Text(
+                                text = "Наши врачи всегда наблюдают за вашими показателями здоровья",
+                                fontSize = 14.sp,
+                                color = descriptionColor,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -128,26 +174,33 @@ class OnboardActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 for (i in 0..2) {
-                    Box(modifier = Modifier
-                        .size(13.dp)
-                        .background(
-                            if (pagerState.currentPage == i) {
-                                secondaryColor
-                            } else {
-                                Color.White
-                            }
-                        )
-                        .clip(CircleShape)
-                        .border(0.85.dp, secondaryColor)
-                        .clip(CircleShape)
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(13.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (pagerState.currentPage == i) {
+                                    secondaryColor
+                                } else {
+                                    Color.White
+                                }
+                            )
+                            .border(0.85.dp, secondaryColor, CircleShape)
                     )
                 }
             }
-            Image(
-                painter = painterResource(id = images[pagerState.currentPage]),
-                contentDescription = "",
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+        }
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.align(Alignment.BottomCenter).padding(vertical = 60.dp)) {
+                Spacer(modifier = Modifier.height(60.dp))
+                Image(
+                    painter = painterResource(id = images[pagerState.currentPage]),
+                    contentDescription = "",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).height(250.dp)
+                )
+            }
         }
     }
 }
