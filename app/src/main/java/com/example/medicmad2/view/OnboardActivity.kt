@@ -63,16 +63,16 @@ class OnboardActivity : ComponentActivity() {
             R.drawable.onboard_image_3,
         )
         
-        var buttonText by  rememberSaveable { mutableStateOf("Пропустит") }
+        var buttonText by  rememberSaveable { mutableStateOf("Пропустить") }
 
         val pagerState = rememberPagerState()
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.collect() {
                 buttonText = if (it == 2) {
-                    "Завершит"
+                    "Завершить"
                 } else {
-                    "Пропустит"
+                    "Пропустить"
                 }
             }
         }
@@ -111,7 +111,7 @@ class OnboardActivity : ComponentActivity() {
                             modifier = Modifier.widthIn(max = 230.dp)
                         ) {
                             Text(
-                                text = "Анализ",
+                                text = "Анализы",
                                 fontSize = 20.sp,
                                 color = onboardTitleColor,
                                 textAlign = TextAlign.Center
@@ -131,7 +131,7 @@ class OnboardActivity : ComponentActivity() {
                             modifier = Modifier.widthIn(max = 230.dp)
                         ) {
                             Text(
-                                text = "Уведомлени",
+                                text = "Уведомления",
                                 fontSize = 20.sp,
                                 color = onboardTitleColor,
                                 textAlign = TextAlign.Center
@@ -151,7 +151,7 @@ class OnboardActivity : ComponentActivity() {
                             modifier = Modifier.widthIn(max = 230.dp)
                         ) {
                             Text(
-                                text = "Мониторин",
+                                text = "Мониторинг",
                                 fontSize = 20.sp,
                                 color = onboardTitleColor,
                                 textAlign = TextAlign.Center
