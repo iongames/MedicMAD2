@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModelProvider
 import com.example.medicmad2.R
 import com.example.medicmad2.ui.components.AppButton
@@ -64,10 +65,12 @@ class LoginActivity : ComponentActivity() {
         var isEnabled by rememberSaveable { mutableStateOf(false) }
 
         var isAlertDialogVisible by rememberSaveable { mutableStateOf(false) }
+        var isLoading by rememberSaveable { mutableStateOf(false) }
 
         val message by viewModel.message.observeAsState()
         LaunchedEffect(message) {
             if (message != null) {
+                isLoading = false
                 isAlertDialogVisible = true
             }
         }
@@ -75,6 +78,8 @@ class LoginActivity : ComponentActivity() {
         val responseCode by viewModel.responseCode.observeAsState()
         LaunchedEffect(responseCode) {
             if (responseCode == 200) {
+                isLoading = false
+
                 val intent = Intent(mContext, EmailCodeActivity::class.java)
                 intent.putExtra("email", email)
 
@@ -138,6 +143,7 @@ class LoginActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (Regex("^[a-zA-Z0-9]+@([a-zA-Z0-9.]+)+[a-z]{2,}$").matches(email)) {
+                        isLoading = true
                         viewModel.sendEmailCode(email)
                     } else {
                         Toast.makeText(mContext, "Неправильный формат E-Mail", Toast.LENGTH_SHORT).show()
@@ -183,6 +189,12 @@ class LoginActivity : ComponentActivity() {
                     }
                 }
             )
+        }
+
+        if (isLoading) {
+            Dialog(onDismissRequest = {}) {
+                CircularProgressIndicator()
+            }
         }
     }
 }

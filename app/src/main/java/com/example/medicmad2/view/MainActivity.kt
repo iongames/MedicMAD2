@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     startActivity(intent)
                 } else {
                     if (sharedPreferences.getString("token", "") != "") {
-                        if (sharedPreferences.getString("password", "") != "") {
+                        if (sharedPreferences.getString("password", "") == "") {
                             val intent = Intent(mContext, CreatePasswordActivity::class.java)
                             startActivity(intent)
                         } else {

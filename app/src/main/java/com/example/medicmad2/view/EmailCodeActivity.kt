@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModelProvider
 import com.example.medicmad2.ui.components.AppBackButton
 import com.example.medicmad2.ui.components.AppTextButton
@@ -53,7 +54,6 @@ class EmailCodeActivity : ComponentActivity() {
     Дата создания: 08.03.2023 12:50
     Автор: Георгий Хасанов
     */
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun EmailCodeContent() {
         val mContext = LocalContext.current
@@ -68,17 +68,20 @@ class EmailCodeActivity : ComponentActivity() {
         var emailCode4 by rememberSaveable { mutableStateOf("") }
 
         var isAlertDialogVisible by rememberSaveable { mutableStateOf(false) }
+        var isLoading by rememberSaveable { mutableStateOf(false) }
 
         val message by viewModel.message.observeAsState()
         LaunchedEffect(message) {
             if (message != null) {
                 isAlertDialogVisible = true
+                isLoading = false
             }
         }
 
         val token by viewModel.token.observeAsState()
         LaunchedEffect(token) {
             if (token != null) {
+                isLoading = false
                 with(sharedPreferences.edit()) {
                     putString("token", token)
                     apply()
@@ -187,6 +190,7 @@ class EmailCodeActivity : ComponentActivity() {
                                     emailCode4 = it
                                     focus.clearFocus()
 
+                                    isLoading = true
                                     viewModel.checkEmailCode(intent.getStringExtra("email").toString(), "$emailCode1$emailCode2$emailCode3$emailCode4")
                                 }
                             },
@@ -221,6 +225,12 @@ class EmailCodeActivity : ComponentActivity() {
                     }
                 }
             )
+        }
+
+        if (isLoading) {
+            Dialog(onDismissRequest = {}) {
+                CircularProgressIndicator()
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ val secondaryTextColor = Color(0xFF7E7E9A)
 
 val inputColor = Color(0xFFF5F5F9)
 val strokeColor = Color(0xFFEBEBEB)
+val selectedStrokeColor = Color(0xFFB8C1CC)
 
 val placeholderColor = Color.Black.copy(0.5f)
 
