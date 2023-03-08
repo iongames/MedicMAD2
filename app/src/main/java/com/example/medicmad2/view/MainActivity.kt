@@ -49,8 +49,18 @@ class MainActivity : ComponentActivity() {
                     val intent = Intent(mContext, OnboardActivity::class.java)
                     startActivity(intent)
                 } else {
-                    val intent = Intent(mContext, LoginActivity::class.java)
-                    startActivity(intent)
+                    if (sharedPreferences.getString("token", "") != "") {
+                        if (sharedPreferences.getString("password", "") != "") {
+                            val intent = Intent(mContext, CreatePasswordActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            val intent = Intent(mContext, CreateCardActivity::class.java)
+                            startActivity(intent)
+                        }
+                    } else {
+                        val intent = Intent(mContext, LoginActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
             }
         }

@@ -2,4 +2,7 @@
     <string name="app_name">MedicMAD2</string>
     <string name="title_activity_onboard">OnboardActivity</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_email_code">EmailCodeActivity</string>
+    <string name="title_activity_create_password">CreatePasswordActivity</string>
+    <string name="title_activity_create_card">CreateCardActivity</string>
 </resources>

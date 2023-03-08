@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +15,34 @@
         android:theme="@style/Theme.MedicMAD2"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".view.CreateCardActivity"
+            android:exported="false"
+            android:label="@string/title_activity_create_card"
+            android:theme="@style/Theme.MedicMAD2">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".view.CreatePasswordActivity"
+            android:exported="false"
+            android:label="@string/title_activity_create_password"
+            android:theme="@style/Theme.MedicMAD2">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".view.EmailCodeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_email_code"
+            android:theme="@style/Theme.MedicMAD2"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".view.LoginActivity"
             android:exported="false"
