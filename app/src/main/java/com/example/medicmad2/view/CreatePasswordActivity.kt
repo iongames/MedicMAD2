@@ -91,7 +91,8 @@ class CreatePasswordActivity : ComponentActivity() {
                         fontSize = 15.sp,
                         fontWeight = FontWeight.W400
                     ) {
-                        onBackPressed()
+                        val intent = Intent(mContext, CreateCardActivity::class.java)
+                        startActivity(intent)
                     }
                 }
             }
