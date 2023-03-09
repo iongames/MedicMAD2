@@ -1,14 +1,13 @@
 package com.example.medicmad2.common
 
+import com.example.medicmad2.model.CatalogItem
+import com.example.medicmad2.model.NewsItem
 import com.example.medicmad2.model.User
 import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.Header
-import retrofit2.http.Headers
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ApiService {
 
@@ -30,6 +29,18 @@ interface ApiService {
     )
     @POST("createProfile")
     suspend fun createProfileCard(@Header("Authorization") token: String, @Body user: User): Response<JsonObject>
+
+    @Headers(
+        "accept: application/json"
+    )
+    @GET("news")
+    suspend fun getNews(): List<NewsItem>
+
+    @Headers(
+        "accept: application/json"
+    )
+    @GET("catalog")
+    suspend fun getCatalog(): List<CatalogItem>
 
     companion object {
         var apiService: ApiService? = null

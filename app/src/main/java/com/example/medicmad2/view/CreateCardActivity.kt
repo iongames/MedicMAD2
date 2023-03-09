@@ -1,6 +1,7 @@
 package com.example.medicmad2.view
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -89,6 +90,9 @@ class CreateCardActivity : ComponentActivity() {
         LaunchedEffect(response) {
             if (response == 200) {
                 isLoading = false
+
+                val intent = Intent(mContext, HomeActivity::class.java)
+                startActivity(intent)
             }
         }
 
@@ -113,7 +117,8 @@ class CreateCardActivity : ComponentActivity() {
                         fontSize = 15.sp,
                         fontWeight = FontWeight.W400
                     ) {
-                        onBackPressed()
+                        val intent = Intent(mContext, HomeActivity::class.java)
+                        startActivity(intent)
                     }
                 }
             }
