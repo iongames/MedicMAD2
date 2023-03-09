@@ -173,7 +173,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 modifier = Modifier.padding(horizontal = 20.dp)
             ) {
                 item { Spacer(modifier = Modifier.height(24.dp)) }
-                items(viewModel.catalog.distinct()) { item ->
+                items(viewModel.catalog.filter { it.category.lowercase() == selectedCategory.lowercase() }.distinct()) { item ->
                     AppCatalogItemCard(catalogItem = item) {
 
                     }

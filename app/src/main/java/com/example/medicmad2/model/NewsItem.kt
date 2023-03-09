@@ -3,6 +3,11 @@ package com.example.medicmad2.model
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+/*
+Описание: Модель карты новостей и акций
+Дата создания: 09.03.2023 10:20
+Автор: Георгий Хасанов
+*/
 @Keep
 data class NewsItem(
     @SerializedName("id")

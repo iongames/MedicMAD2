@@ -10,6 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.example.medicmad2.R
 
+/*
+Описание: Экран результатов анализов
+Дата создания: 09.03.2023 9:40
+Автор: Георгий Хасанов
+*/
 @Composable
 fun ResultsScreen() {
     Box(modifier = Modifier.fillMaxSize()) {

@@ -10,6 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.example.medicmad2.R
 
+/*
+Описание: Экран поддержки
+Дата создания: 09.03.2023 9:40
+Автор: Георгий Хасанов
+*/
 @Composable
 fun SupportScreen() {
     Box(modifier = Modifier.fillMaxSize()) {

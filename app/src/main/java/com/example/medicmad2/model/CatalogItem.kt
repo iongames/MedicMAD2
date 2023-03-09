@@ -3,6 +3,11 @@ package com.example.medicmad2.model
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+/*
+Описание: Модель карты каталога анализов
+Дата создания: 09.03.2023 10:30
+Автор: Георгий Хасанов
+*/
 @Keep
 data class CatalogItem(
     @SerializedName("id")
