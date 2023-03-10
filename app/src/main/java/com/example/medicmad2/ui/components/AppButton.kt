@@ -2,12 +2,11 @@ package com.example.medicmad2.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -100,5 +99,54 @@ fun AppBackButton(
             tint = descriptionColor,
             modifier = Modifier.padding(6.dp)
         )
+    }
+}
+
+/*
+Описание: Кнопка перехода в корзину
+Дата создания: 10.03.2023 9:45
+Автор: Георгий Хасанов
+*/
+@Composable
+fun AppCartButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    price: String,
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        elevation = ButtonDefaults.elevation(0.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary, disabledBackgroundColor = primaryDisabledColor),
+        contentPadding = PaddingValues(16.dp),
+        onClick = onClick
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_cart),
+                    contentDescription = "",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = text,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.W600,
+                    color = Color.White
+                )
+            }
+            Text(
+                text = "$price ₽",
+                fontSize = 17.sp,
+                fontWeight = FontWeight.W600,
+                color = Color.White
+            )
+        }
     }
 }

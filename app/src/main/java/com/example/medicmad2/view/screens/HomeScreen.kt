@@ -1,8 +1,10 @@
 package com.example.medicmad2.view.screens
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -34,6 +36,7 @@ import com.example.medicmad2.ui.components.*
 import com.example.medicmad2.ui.theme.descriptionColor
 import com.example.medicmad2.ui.theme.placeholderColor
 import com.example.medicmad2.ui.theme.secondaryTextColor
+import com.example.medicmad2.view.CartActivity
 import com.example.medicmad2.viewmodel.HomeViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -102,8 +105,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
         }
     }
 
-    val cart: MutableList<CartItem> = remember { mutableStateListOf() }
-    cart.addAll(CartService().getCartData(sharedPreferences))
+    var cart: MutableList<CartItem> = remember { mutableStateListOf() }
 
     var selectedCatalogItem by remember { mutableStateOf(CatalogItem(0, "", "", "", "", "", "", "",)) }
 
@@ -114,6 +116,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
         isLoading = true
         viewModel.getNews()
         viewModel.getCatalog()
+
+        cart.addAll(CartService().getCartData(sharedPreferences))
     }
 
     ModalBottomSheetLayout(
@@ -213,7 +217,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                                 val itemIndex = cart.indexOfFirst { it.id == item.id }
 
                                 if (itemIndex == -1) {
-                                    CartService().addToCart(
+                                    cart = CartService().addToCart(
                                         CartItem(
                                             item.id,
                                             item.name,
@@ -223,7 +227,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                                         cart
                                     )
                                 } else {
-                                    CartService().removeFromCart(
+                                    cart = CartService().removeFromCart(
                                         itemIndex,
                                         cart
                                     )
@@ -240,6 +244,34 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
+                }
+            }
+        }
+    }
+
+    if (cart.isNotEmpty()) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                var cartSumPrice = 0
+
+                for (item in cart) {
+                    cartSumPrice += (item.price.toInt() * item.count)
+                }
+                AppCartButton(
+                    text = "В корзину",
+                    price = cartSumPrice.toString(),
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    val intent = Intent(mContext, CartActivity::class.java)
+                    mContext.startActivity(intent)
                 }
             }
         }
