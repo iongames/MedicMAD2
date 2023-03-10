@@ -22,10 +22,7 @@ import com.example.medicmad2.R
 import com.example.medicmad2.model.CartItem
 import com.example.medicmad2.model.CatalogItem
 import com.example.medicmad2.model.NewsItem
-import com.example.medicmad2.ui.theme.descriptionColor
-import com.example.medicmad2.ui.theme.inputColor
-import com.example.medicmad2.ui.theme.primaryColor
-import com.example.medicmad2.ui.theme.secondaryTextColor
+import com.example.medicmad2.ui.theme.*
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -104,7 +101,7 @@ fun AppCatalogItemCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(3.dp, MaterialTheme.shapes.large, ambientColor = Color(0x1A000000))
+            .shadow(2.dp, MaterialTheme.shapes.large, ambientColor = Color(0x1A000000))
             .height(160.dp)
             .clip(MaterialTheme.shapes.large)
             .background(Color.White)
@@ -202,24 +199,25 @@ fun AppCategoryCard(
 Автор: Георгий Хасанов
 */
 @Composable
-fun AppCatalogItemCard(
+fun AppCartItemCard(
     cartItem: CartItem,
-    onItemDelete: () -> Unit,
-    onClick: () -> Unit
+    onItemAdd: () -> Unit,
+    onItemDelete: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(3.dp, MaterialTheme.shapes.large, ambientColor = Color(0x1A000000))
+            .shadow(2.dp, MaterialTheme.shapes.large, ambientColor = Color(0x1A000000))
             .height(160.dp)
             .clip(MaterialTheme.shapes.large)
             .background(Color.White)
             .border(1.dp, Color(0xFFF4F4F4), MaterialTheme.shapes.large)
-            .clickable { onClick() }
     )  {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Text(
                 cartItem.name,
@@ -228,15 +226,15 @@ fun AppCatalogItemCard(
                 softWrap = true,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .padding(16.dp)
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_close),
                 contentDescription = "",
+                tint = secondaryTextColor,
                 modifier = Modifier
                     .size(20.dp)
                     .clickable {
-
+                        onItemDelete()
                     }
             )
         }
@@ -253,7 +251,49 @@ fun AppCatalogItemCard(
                 fontWeight = FontWeight.W500
             )
             Spacer(modifier = Modifier.height(4.dp))
-
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "${cartItem.count} пациент",
+                    fontSize = 15.sp
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Card(
+                    backgroundColor = inputColor,
+                    elevation = 0.dp
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(6.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_minus),
+                            contentDescription = "",
+                            tint = if (cartItem.count > 1) descriptionColor else selectedStrokeColor,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable(enabled = cartItem.count > 1) {
+                                    onItemDelete()
+                                }
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier
+                            .size(width = 1.dp, height = 16.dp)
+                            .background(strokeColor)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_plus),
+                            contentDescription = "",
+                            tint = descriptionColor,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    onItemAdd()
+                                }
+                        )
+                    }
+                }
+            }
         }
     }
 }

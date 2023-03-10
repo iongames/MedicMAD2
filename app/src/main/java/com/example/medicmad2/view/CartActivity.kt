@@ -19,18 +19,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medicmad2.R
 import com.example.medicmad2.common.CartService
 import com.example.medicmad2.model.CartItem
 import com.example.medicmad2.ui.components.AppBackButton
+import com.example.medicmad2.ui.components.AppButton
+import com.example.medicmad2.ui.components.AppCartItemCard
 import com.example.medicmad2.ui.theme.MedicMAD2Theme
+import com.example.medicmad2.ui.theme.selectedStrokeColor
 
 /*
 Описание: Класс экрана корзины
-Дата создания: 09.03.2023 9:55
+Дата создания: 10.03.2023 9:55
 Автор: Георгий Хасанов
 */
 class CartActivity : ComponentActivity() {
@@ -71,6 +73,7 @@ class CartActivity : ComponentActivity() {
                             val intent = Intent(mContext,HomeActivity::class.java)
                             startActivity(intent)
                         }
+                        Spacer(modifier = Modifier.height(24.dp))
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier.fillMaxWidth()
@@ -80,18 +83,19 @@ class CartActivity : ComponentActivity() {
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.W700
                             )
-                        }
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_remove_all),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(20.dp)
-                                .clickable {
-                                    cart.clear()
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_remove_all),
+                                contentDescription = "",
+                                tint = selectedStrokeColor,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clickable {
+                                        cart.clear()
 
-                                    CartService().saveCartData(sharedPreferences, cart)
-                                }
-                        )
+                                        CartService().saveCartData(sharedPreferences, cart)
+                                    }
+                            )
+                        }
                     }
                 }
             }
@@ -101,19 +105,68 @@ class CartActivity : ComponentActivity() {
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .align(Alignment.Center)
-                ) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    LazyColumn {
-                        items(cart.distinct()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                LazyColumn(modifier = Modifier.padding(horizontal = 20.dp)) {
+                    item { Spacer(modifier = Modifier.height(12.dp)) }
+                    items(cart.distinct()) { item ->
+                        AppCartItemCard(
+                            item,
+                            onItemAdd = {
+                                cart = CartService().addToCart(item, cart)
+                                CartService().saveCartData(sharedPreferences, cart)
 
+                                cart.clear()
+                                cart.addAll(CartService().getCartData(sharedPreferences))
+                            },
+                            onItemDelete = {
+                                val itemIndex = cart.indexOfFirst { it.id == item.id }
+
+                                cart = CartService().removeFromCart(itemIndex, cart)
+                                CartService().saveCartData(sharedPreferences, cart)
+
+                                cart.clear()
+                                cart.addAll(CartService().getCartData(sharedPreferences))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
+                    item {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Сумма",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W600
+                            )
+
+                            var cartSumPrice = 0
+
+                            for (item in cart.distinct()) {
+                                cartSumPrice += (item.price.toInt() * item.count)
+                            }
+
+                            Text(
+                                "$cartSumPrice ₽",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W600
+                            )
                         }
                     }
+                }
+                AppButton(
+                    text = "Перейти к оформлению заказа",
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.W600,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp).padding(bottom = 32.dp)
+                        .align(Alignment.BottomCenter)
+                ) {
+                    val intent = Intent(mContext, PayActivity::class.java)
+                    startActivity(intent)
                 }
             }
         }

@@ -64,14 +64,7 @@ class CartService {
         val itemIndex = cart.indexOfFirst { it.id == cartItem.id }
 
         if (itemIndex != -1) {
-            cart.add(
-                CartItem(
-                    cartItem.id,
-                    cartItem.name,
-                    cartItem.price,
-                    cart[itemIndex].count + 1
-                )
-            )
+            cart[itemIndex].count += 1
         } else {
             cart.add(
                 CartItem(

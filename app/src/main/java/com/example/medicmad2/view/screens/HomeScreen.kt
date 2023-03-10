@@ -265,6 +265,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 for (item in cart.distinct()) {
                     cartSumPrice += (item.price.toInt() * item.count)
                 }
+
                 AppCartButton(
                     text = "В корзину",
                     price = cartSumPrice.toString(),
