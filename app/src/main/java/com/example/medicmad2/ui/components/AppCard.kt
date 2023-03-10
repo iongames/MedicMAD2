@@ -15,7 +15,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medicmad2.R
@@ -295,5 +298,62 @@ fun AppCartItemCard(
                 }
             }
         }
+    }
+}
+
+/*
+Описание: Карточка поиска товара
+Дата создания: 10.03.2023 12:00
+Автор: Георгий Хасанов
+*/
+@Composable
+fun AppSearchItemCard(
+    catalogItem: CatalogItem,
+    searchText: String,
+    onClick: () -> Unit
+) {
+    val text = "${catalogItem.name} (${catalogItem.bio})".split(searchText, ignoreCase = true)
+
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .clickable { onClick() }
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+        ) {
+            Text(
+                buildAnnotatedString {
+                    for ((index, t) in text.withIndex()) {
+                        append(t)
+
+                        if (index != text.size - 1) {
+                            withStyle(SpanStyle(color = primaryColor)) {
+                                append(searchText.lowercase())
+                            }
+                        }
+                    }
+                },
+                color = Color.Black,
+                fontSize = 15.sp,
+                modifier = Modifier.fillMaxWidth(0.6f)
+            )
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    "${catalogItem.price} ₽",
+                    fontSize = 17.sp,
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+                Text(
+                    "${catalogItem.time_result} ₽",
+                    fontSize = 14.sp,
+                    color = descriptionColor
+                )
+            }
+        }
+        Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(dividerColor))
     }
 }

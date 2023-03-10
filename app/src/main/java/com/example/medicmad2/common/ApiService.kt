@@ -31,6 +31,13 @@ interface ApiService {
     suspend fun createProfileCard(@Header("Authorization") token: String, @Body user: User): Response<JsonObject>
 
     @Headers(
+        "accept: application/json",
+        "Content-Type: application/json"
+    )
+    @PUT("updateProfile")
+    suspend fun updateProfileCard(@Header("Authorization") token: String, @Body user: User): Response<JsonObject>
+
+    @Headers(
         "accept: application/json"
     )
     @GET("news")

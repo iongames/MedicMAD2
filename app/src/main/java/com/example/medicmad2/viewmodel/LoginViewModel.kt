@@ -57,6 +57,11 @@ class LoginViewModel: ViewModel() {
         }
     }
 
+    /*
+    Описание: Метод добавления данных карты пользователя
+    Дата создания: 08.03.2023 12:20
+    Автор: Георгий Хасанов
+    */
     fun createProfileCard(token: String, user: User) {
         responseCode.value = null
         message.value = null
@@ -66,6 +71,32 @@ class LoginViewModel: ViewModel() {
 
             try {
                 val json = apiService.createProfileCard("Bearer ${token.replace("\"", "")}", user)
+
+                if (json.code() == 200) {
+                    cardResponseCode.value = 200
+                } else {
+                    message.value = json.code().toString()
+                }
+            } catch (e: Exception) {
+                message.value = e.message
+            }
+        }
+    }
+
+    /*
+    Описание: Метод обновления данных карты пользователя
+    Дата создания: 10.03.2023 12:20
+    Автор: Георгий Хасанов
+    */
+    fun updateProfileCard(token: String, user: User) {
+        responseCode.value = null
+        message.value = null
+
+        viewModelScope.launch {
+            val apiService = ApiService.getInstance()
+
+            try {
+                val json = apiService.updateProfileCard("Bearer ${token.replace("\"", "")}", user)
 
                 if (json.code() == 200) {
                     cardResponseCode.value = 200
