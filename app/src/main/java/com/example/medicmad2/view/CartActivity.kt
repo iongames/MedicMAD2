@@ -113,7 +113,8 @@ class CartActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(12.dp))
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier
+                        .fillMaxHeight()
                 ) {
                     LazyColumn(modifier = Modifier.padding(horizontal = 20.dp)) {
                         item { Spacer(modifier = Modifier.height(12.dp)) }

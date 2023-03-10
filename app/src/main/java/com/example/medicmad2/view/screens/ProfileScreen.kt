@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModelProvider
 import com.example.medicmad2.R
@@ -35,6 +36,12 @@ import com.example.medicmad2.ui.theme.*
 import com.example.medicmad2.view.CreateCardActivity
 import com.example.medicmad2.view.HomeActivity
 import com.example.medicmad2.viewmodel.LoginViewModel
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -81,6 +88,8 @@ fun ProfileScreen(viewModel: LoginViewModel, imageResultLauncher: ActivityResult
     var isAlertDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isLoading by rememberSaveable { mutableStateOf(false) }
 
+    var isDialogVisible by rememberSaveable { mutableStateOf(false) }
+
     val message by viewModel.message.observeAsState()
     LaunchedEffect(message) {
         if (message != null) {
@@ -100,6 +109,7 @@ fun ProfileScreen(viewModel: LoginViewModel, imageResultLauncher: ActivityResult
     }
 
     val selectedImage by viewModel.selectedImage.observeAsState()
+    val selectedVideo by viewModel.selectedVideo.observeAsState()
 
     Scaffold(
         topBar = {
@@ -138,14 +148,11 @@ fun ProfileScreen(viewModel: LoginViewModel, imageResultLauncher: ActivityResult
                         .background(Color(0x80D9D9D9))
                         .align(Alignment.CenterHorizontally)
                         .clickable {
-                            val intent = Intent()
-                            intent.action = MediaStore.ACTION_IMAGE_CAPTURE
-
-                            imageResultLauncher.launch(intent)
+                            isDialogVisible = true
                         }
                 ) {
                     if (userList.isNotEmpty()) {
-                        if (userList[0].image == "" && selectedImage == null) {
+                        if (userList[0].image == "" && selectedImage == null && selectedVideo == null) {
                             Image(
                                 painter = painterResource(id = R.drawable.photo),
                                 contentDescription = "",
@@ -153,16 +160,36 @@ fun ProfileScreen(viewModel: LoginViewModel, imageResultLauncher: ActivityResult
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         } else {
-                            GlideImage(
-                                imageModel = if (selectedImage == null) userList[0].image else selectedImage,
-                                imageOptions = ImageOptions(
-                                    contentScale = ContentScale.Crop,
-                                    alignment = Alignment.Center
-                                )
-                            )
-                        }
-                    } else {
+                            if (selectedVideo != null) {
+                                val exoPlayer = ExoPlayer.Builder(mContext).build().apply {
+                                    val dataSourceFactory = DefaultDataSourceFactory(mContext, mContext.packageName)
+                                    val source = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(selectedVideo.toString()))
 
+                                    prepare(source)
+                                }
+
+
+                                AndroidView(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    factory = {
+                                    PlayerView(it).apply {
+                                        player = exoPlayer
+                                        exoPlayer.repeatMode = Player.REPEAT_MODE_ALL
+                                        useController = false
+
+                                        exoPlayer.play()
+                                    }
+                                })
+                            } else {
+                                GlideImage(
+                                    imageModel = if (selectedImage == null) userList[0].image else selectedImage,
+                                    imageOptions = ImageOptions(
+                                        contentScale = ContentScale.Crop,
+                                        alignment = Alignment.Center
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
                 Text(
@@ -291,6 +318,25 @@ fun ProfileScreen(viewModel: LoginViewModel, imageResultLauncher: ActivityResult
                             image = ""
                         )
                     )
+                }
+            }
+        }
+    }
+
+    if (isDialogVisible) {
+        Dialog(onDismissRequest = { isDialogVisible = false }) {
+            Row() {
+                AppButton(text = "PHOTO") {
+                    val intent = Intent()
+                    intent.action = MediaStore.ACTION_IMAGE_CAPTURE
+
+                    imageResultLauncher.launch(intent)
+                }
+                AppButton(text = "VIDEO") {
+                    val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+                    intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 3)
+
+                    videoResultLauncher.launch(intent)
                 }
             }
         }

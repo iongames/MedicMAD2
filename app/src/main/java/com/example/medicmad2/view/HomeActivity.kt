@@ -2,6 +2,7 @@ package com.example.medicmad2.view
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -174,7 +175,7 @@ class HomeActivity : ComponentActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             val loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
 
-            val data = result.data
+            val data: Intent? = result.data
 
             loginViewModel.selectedImage.value = data!!.extras!!.get("data") as Bitmap
         }
@@ -184,7 +185,7 @@ class HomeActivity : ComponentActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             val loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
 
-            val data = result.data
+            val data: Intent? = result.data
 
             loginViewModel.selectedVideo.value = data!!.data.toString()
         }
