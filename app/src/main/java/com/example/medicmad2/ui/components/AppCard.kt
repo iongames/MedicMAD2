@@ -1,12 +1,10 @@
 package com.example.medicmad2.ui.components
 
 import android.graphics.Paint.Align
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -58,7 +56,9 @@ fun AppNewsItemCard(
         GlideImage(
             imageModel = newsItem.image,
             imageOptions = ImageOptions(alignment = Alignment.CenterEnd, contentScale = ContentScale.FillHeight),
-            modifier = Modifier.align(Alignment.BottomEnd).offset(x = 10.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(x = 10.dp)
         )
         Text(
             newsItem.name,
@@ -97,6 +97,8 @@ fun AppNewsItemCard(
 @Composable
 fun AppCatalogItemCard(
     catalogItem: CatalogItem,
+    itemInCart: Boolean,
+    onButtonClick: () -> Unit,
     onClick: () -> Unit
 ) {
     Box(
@@ -141,13 +143,29 @@ fun AppCatalogItemCard(
                     color = Color.Black
                 )
             }
-            AppButton(
-                text = "Добавить",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W600,
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
-                onClick = onClick
-            )
+            if (itemInCart) {
+                AppButton(
+                    text = "Убрать",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W600,
+                    color = primaryColor,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White
+                    ),
+                    borderStroke = BorderStroke(1.dp, primaryColor),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+                    onClick = onButtonClick
+                )
+            } else {
+                AppButton(
+                    text = "Добавить",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W600,
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+                    onClick = onButtonClick
+                )
+            }
+
         }
     }
 }
