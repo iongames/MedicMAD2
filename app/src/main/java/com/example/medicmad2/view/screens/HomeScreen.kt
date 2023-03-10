@@ -262,7 +262,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
             ) {
                 var cartSumPrice = 0
 
-                for (item in cart) {
+                for (item in cart.distinct()) {
                     cartSumPrice += (item.price.toInt() * item.count)
                 }
                 AppCartButton(

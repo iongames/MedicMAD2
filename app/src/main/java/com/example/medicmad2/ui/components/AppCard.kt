@@ -4,10 +4,7 @@ import android.graphics.Paint.Align
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,9 +14,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.medicmad2.R
+import com.example.medicmad2.model.CartItem
 import com.example.medicmad2.model.CatalogItem
 import com.example.medicmad2.model.NewsItem
 import com.example.medicmad2.ui.theme.descriptionColor
@@ -193,5 +193,67 @@ fun AppCategoryCard(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
             color = if (selectedItem == title) { Color.White } else { secondaryTextColor }
         )
+    }
+}
+
+/*
+Описание: Карточка товара корзины
+Дата создания: 09.03.2023 10:00
+Автор: Георгий Хасанов
+*/
+@Composable
+fun AppCatalogItemCard(
+    cartItem: CartItem,
+    onItemDelete: () -> Unit,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(3.dp, MaterialTheme.shapes.large, ambientColor = Color(0x1A000000))
+            .height(160.dp)
+            .clip(MaterialTheme.shapes.large)
+            .background(Color.White)
+            .border(1.dp, Color(0xFFF4F4F4), MaterialTheme.shapes.large)
+            .clickable { onClick() }
+    )  {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                cartItem.name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.W500,
+                softWrap = true,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .padding(16.dp)
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_close),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable {
+
+                    }
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "${cartItem.price} ₽",
+                fontSize = 17.sp,
+                fontWeight = FontWeight.W500
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+
+        }
     }
 }
