@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
 import com.example.medicmad2.R
 import com.example.medicmad2.common.CartService
 import com.example.medicmad2.model.CartItem
@@ -127,6 +128,16 @@ fun HomeScreen(viewModel: HomeViewModel) {
         sheetContent = {
             AnalysisCard(catalogItem = selectedCatalogItem) {
                 scope.launch {
+                    cart = CartService().addToCart(
+                        CartItem(
+                            selectedCatalogItem.id,
+                            selectedCatalogItem.name,
+                            selectedCatalogItem.price,
+                            1
+                        ),
+                        cart
+                    )
+
                     sheetState.hide()
                 }
             }
@@ -249,7 +260,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
         }
     }
 
-    if (cart.isNotEmpty()) {
+    if (cart.isNotEmpty() && sheetState.currentValue != ModalBottomSheetValue.Expanded) {
         Box(modifier = Modifier
             .fillMaxSize()
         ) {

@@ -106,67 +106,72 @@ class CartActivity : ComponentActivity() {
                     .padding(padding)
             ) {
                 Spacer(modifier = Modifier.height(12.dp))
-                LazyColumn(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    item { Spacer(modifier = Modifier.height(12.dp)) }
-                    items(cart.distinct()) { item ->
-                        AppCartItemCard(
-                            item,
-                            onItemAdd = {
-                                cart = CartService().addToCart(item, cart)
-                                CartService().saveCartData(sharedPreferences, cart)
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    LazyColumn(modifier = Modifier.padding(horizontal = 20.dp)) {
+                        item { Spacer(modifier = Modifier.height(12.dp)) }
+                        items(cart.distinct()) { item ->
+                            AppCartItemCard(
+                                item,
+                                onItemAdd = {
+                                    cart = CartService().addToCart(item, cart)
+                                    CartService().saveCartData(sharedPreferences, cart)
 
-                                cart.clear()
-                                cart.addAll(CartService().getCartData(sharedPreferences))
-                            },
-                            onItemDelete = {
-                                val itemIndex = cart.indexOfFirst { it.id == item.id }
+                                    cart.clear()
+                                    cart.addAll(CartService().getCartData(sharedPreferences))
+                                },
+                                onItemDelete = {
+                                    val itemIndex = cart.indexOfFirst { it.id == item.id }
 
-                                cart = CartService().removeFromCart(itemIndex, cart)
-                                CartService().saveCartData(sharedPreferences, cart)
+                                    cart = CartService().removeFromCart(itemIndex, cart)
+                                    CartService().saveCartData(sharedPreferences, cart)
 
-                                cart.clear()
-                                cart.addAll(CartService().getCartData(sharedPreferences))
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                    item { Spacer(modifier = Modifier.height(24.dp)) }
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Сумма",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.W600
+                                    cart.clear()
+                                    cart.addAll(CartService().getCartData(sharedPreferences))
+                                }
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                        item { Spacer(modifier = Modifier.height(24.dp)) }
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Сумма",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.W600
+                                )
 
-                            var cartSumPrice = 0
+                                var cartSumPrice = 0
 
-                            for (item in cart.distinct()) {
-                                cartSumPrice += (item.price.toInt() * item.count)
+                                for (item in cart.distinct()) {
+                                    cartSumPrice += (item.price.toInt() * item.count)
+                                }
+
+                                Text(
+                                    "$cartSumPrice ₽",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.W600
+                                )
                             }
-
-                            Text(
-                                "$cartSumPrice ₽",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.W600
-                            )
                         }
                     }
-                }
-                AppButton(
-                    text = "Перейти к оформлению заказа",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.W600,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp).padding(bottom = 32.dp)
-                        .align(Alignment.BottomCenter)
-                ) {
-                    val intent = Intent(mContext, PayActivity::class.java)
-                    startActivity(intent)
+                    AppButton(
+                        text = "Перейти к оформлению заказа",
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.W600,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                            .padding(bottom = 32.dp)
+                    ) {
+                        val intent = Intent(mContext, PayActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
             }
         }
