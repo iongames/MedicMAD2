@@ -36,8 +36,6 @@ class CartService {
             )
         }
 
-        Log.d("JSON", "getCartData: $jsonCart")
-
         return cart
     }
 

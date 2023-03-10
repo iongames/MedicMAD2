@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModelProvider
 import com.example.medicmad2.R
+import com.example.medicmad2.common.UserService
 import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.components.AppButton
 import com.example.medicmad2.ui.components.AppTextButton
@@ -65,6 +66,12 @@ class CreateCardActivity : ComponentActivity() {
 
         val sharedPreferences = this.getSharedPreferences("shared", Context.MODE_PRIVATE)
 
+        val userList: MutableList<User> = remember { mutableStateListOf() }
+
+        LaunchedEffect(Unit) {
+            userList.addAll(UserService().getUserListData(sharedPreferences))
+        }
+
         var firstName by rememberSaveable { mutableStateOf("") }
         var patronymic by rememberSaveable { mutableStateOf("") }
         var lastName by rememberSaveable { mutableStateOf("") }
@@ -91,6 +98,20 @@ class CreateCardActivity : ComponentActivity() {
             if (response == 200) {
                 isLoading = false
 
+                UserService().addUserToList(
+                    User(
+                        firstname = firstName,
+                        middlename = patronymic,
+                        lastname = lastName,
+                        bith = birthday,
+                        pol = gender,
+                        image = ""
+                    ),
+                    userList
+                )
+
+                UserService().saveUserListData(sharedPreferences, userList)
+
                 val intent = Intent(mContext, HomeActivity::class.java)
                 startActivity(intent)
             }
@@ -103,7 +124,8 @@ class CreateCardActivity : ComponentActivity() {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp).padding(top = 32.dp, bottom = 16.dp)
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 32.dp, bottom = 16.dp)
                 ) {
                     Text(
                         "Создание карты пациента",

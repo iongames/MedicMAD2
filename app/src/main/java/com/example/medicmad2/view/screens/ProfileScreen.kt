@@ -2,32 +2,41 @@ package com.example.medicmad2.view.screens
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
+import android.graphics.Bitmap
+import android.provider.MediaStore
+import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModelProvider
 import com.example.medicmad2.R
+import com.example.medicmad2.common.UserService
 import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.components.AppButton
 import com.example.medicmad2.ui.components.AppTextButton
 import com.example.medicmad2.ui.components.AppTextField
 import com.example.medicmad2.ui.theme.*
+import com.example.medicmad2.view.CreateCardActivity
 import com.example.medicmad2.view.HomeActivity
 import com.example.medicmad2.viewmodel.LoginViewModel
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 /*
 Описание: Экран профиля пользователя
@@ -36,7 +45,7 @@ import com.example.medicmad2.viewmodel.LoginViewModel
 */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ProfileScreen(viewModel: LoginViewModel) {
+fun ProfileScreen(viewModel: LoginViewModel, imageResultLauncher: ActivityResultLauncher<Intent>, videoResultLauncher: ActivityResultLauncher<Intent>) {
     val mContext = LocalContext.current
 
     val sharedPreferences = mContext.getSharedPreferences("shared", Context.MODE_PRIVATE)
@@ -47,6 +56,24 @@ fun ProfileScreen(viewModel: LoginViewModel) {
     var birthday by rememberSaveable { mutableStateOf("") }
 
     var gender by rememberSaveable { mutableStateOf("") }
+
+    val userList: MutableList<User> = remember { mutableStateListOf() }
+
+    LaunchedEffect(Unit) {
+        userList.addAll(UserService().getUserListData(sharedPreferences))
+
+        if (userList.isEmpty()) {
+            val intent = Intent(mContext, CreateCardActivity::class.java)
+            mContext.startActivity(intent)
+        } else {
+            firstName = userList[0].firstname
+            patronymic = userList[0].middlename
+            lastName = userList[0].lastname
+            birthday = userList[0].bith
+            gender = userList[0].pol
+        }
+    }
+
 
     var isEnabled by rememberSaveable { mutableStateOf(false) }
     var isExpanded by rememberSaveable { mutableStateOf(false) }
@@ -72,30 +99,25 @@ fun ProfileScreen(viewModel: LoginViewModel) {
         }
     }
 
+    val selectedImage by viewModel.selectedImage.observeAsState()
+
     Scaffold(
         topBar = {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp).padding(top = 32.dp, bottom = 16.dp)
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 16.dp, bottom = 7.dp)
             ) {
                 Text(
-                    "Создание карты пациента",
+                    "Карта пациента",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.W700,
                     softWrap = true,
-                    modifier = Modifier.fillMaxWidth(0.6f)
+                    textAlign = TextAlign.Center
                 )
-                AppTextButton(
-                    text = "Пропустить",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.W400
-                ) {
-                    val intent = Intent(mContext, HomeActivity::class.java)
-                    mContext.startActivity(intent)
-                }
             }
         }
     ) { padding ->
@@ -107,7 +129,42 @@ fun ProfileScreen(viewModel: LoginViewModel) {
             Column(modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp)) {
+                .padding(horizontal = 20.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 150.dp, height = 125.dp)
+                        .clip(RoundedCornerShape(100))
+                        .background(Color(0x80D9D9D9))
+                        .align(Alignment.CenterHorizontally)
+                        .clickable {
+                            val intent = Intent()
+                            intent.action = MediaStore.ACTION_IMAGE_CAPTURE
+
+                            imageResultLauncher.launch(intent)
+                        }
+                ) {
+                    if (userList.isNotEmpty()) {
+                        if (userList[0].image == "" && selectedImage == null) {
+                            Image(
+                                painter = painterResource(id = R.drawable.photo),
+                                contentDescription = "",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        } else {
+                            GlideImage(
+                                imageModel = if (selectedImage == null) userList[0].image else selectedImage,
+                                imageOptions = ImageOptions(
+                                    contentScale = ContentScale.Crop,
+                                    alignment = Alignment.Center
+                                )
+                            )
+                        }
+                    } else {
+
+                    }
+                }
                 Text(
                     "Без карты пациента вы не сможете заказать анализы.",
                     fontSize = 14.sp,
@@ -215,9 +272,9 @@ fun ProfileScreen(viewModel: LoginViewModel) {
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(22.dp))
                 AppButton(
-                    text = "Создать",
+                    text = "Сохранить",
                     enabled = isEnabled,
                     modifier = Modifier.fillMaxWidth()
                 ) {

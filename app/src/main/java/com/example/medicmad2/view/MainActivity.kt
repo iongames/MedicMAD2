@@ -54,8 +54,13 @@ class MainActivity : ComponentActivity() {
                             val intent = Intent(mContext, CreatePasswordActivity::class.java)
                             startActivity(intent)
                         } else {
-                            val intent = Intent(mContext, CreateCardActivity::class.java)
-                            startActivity(intent)
+                            if (sharedPreferences.getString("userList", "") != "") {
+                                val intent = Intent(mContext, HomeActivity::class.java)
+                                startActivity(intent)
+                            } else {
+                                val intent = Intent(mContext, CreateCardActivity::class.java)
+                                startActivity(intent)
+                            }
                         }
                     } else {
                         val intent = Intent(mContext, LoginActivity::class.java)

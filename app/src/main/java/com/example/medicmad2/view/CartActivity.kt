@@ -50,6 +50,11 @@ class CartActivity : ComponentActivity() {
         }
     }
 
+    /*
+    Описание: Контент экрана корзины
+    Дата создания: 10.03.2023 9:55
+    Автор: Георгий Хасанов
+    */
     @Composable
     fun CartContent() {
         val mContext = LocalContext.current

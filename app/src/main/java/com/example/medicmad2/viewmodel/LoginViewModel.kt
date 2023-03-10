@@ -1,5 +1,6 @@
 package com.example.medicmad2.viewmodel
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,9 @@ class LoginViewModel: ViewModel() {
     val responseCode = MutableLiveData<Int>()
     val cardResponseCode = MutableLiveData<Int>()
     val token = MutableLiveData<String>()
+
+    var selectedImage = MutableLiveData<Bitmap>()
+    var selectedVideo = MutableLiveData<String>()
 
     val message = MutableLiveData<String>()
 

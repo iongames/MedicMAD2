@@ -1,8 +1,12 @@
 package com.example.medicmad2.view
 
+import android.app.Activity
+import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -37,6 +41,7 @@ import com.example.medicmad2.view.screens.ResultsScreen
 import com.example.medicmad2.view.screens.SupportScreen
 import com.example.medicmad2.R
 import com.example.medicmad2.viewmodel.HomeViewModel
+import com.example.medicmad2.viewmodel.LoginViewModel
 
 /*
 Описание: Класс главного экрана с нижним меню
@@ -67,6 +72,10 @@ class HomeActivity : ComponentActivity() {
     */
     @Composable
     fun HomeContent() {
+        val sharedPreferences = this.getSharedPreferences("shared", Context.MODE_PRIVATE)
+
+
+
         navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -140,6 +149,7 @@ class HomeActivity : ComponentActivity() {
     @Composable
     fun Navigation(navHostController: NavHostController) {
         val homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        val loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
 
         NavHost(
             navController = navHostController,
@@ -155,8 +165,28 @@ class HomeActivity : ComponentActivity() {
                 SupportScreen()
             }
             composable("profile") {
-                ProfileScreen()
+                ProfileScreen(loginViewModel, imageResultLauncher, videoResultLauncher)
             }
+        }
+    }
+
+    val imageResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+
+            val data = result.data
+
+            loginViewModel.selectedImage.value = data!!.extras!!.get("data") as Bitmap
+        }
+    }
+
+    val videoResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+
+            val data = result.data
+
+            loginViewModel.selectedVideo.value = data!!.data.toString()
         }
     }
 }
