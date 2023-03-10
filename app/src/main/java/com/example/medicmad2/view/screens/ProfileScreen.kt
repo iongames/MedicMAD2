@@ -75,7 +75,7 @@ fun ProfileScreen(viewModel: LoginViewModel, imageResultLauncher: ActivityResult
     }
 
 
-    var isEnabled by rememberSaveable { mutableStateOf(false) }
+    var isEnabled by rememberSaveable { mutableStateOf(true) }
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
     var isAlertDialogVisible by rememberSaveable { mutableStateOf(false) }
