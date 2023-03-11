@@ -83,6 +83,7 @@ fun AddressBottomSheet(
             fontSize = 14.sp,
             color = secondaryTextColor
         )
+        Spacer(modifier = Modifier.height(4.dp))
         AppTextField(
             value = addressText,
             onValueChange = { addressText = it},
@@ -218,6 +219,7 @@ fun AddressBottomSheet(
             color = secondaryTextColor,
             modifier = Modifier.padding(horizontal = 20.dp)
         )
+        Spacer(modifier = Modifier.height(4.dp))
         AppTextField(
             value = enterCodeText,
             onValueChange = { enterCodeText = it},
@@ -227,13 +229,15 @@ fun AddressBottomSheet(
                 .fillMaxWidth()
         )
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(0.75f)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 "Сохранить этот адрес?",
                 fontSize = 16.sp,
-                fontWeight = FontWeight.W500
+                fontWeight = FontWeight.W500,
+                modifier = Modifier.fillMaxWidth(0.75f)
             )
             Switch(
                 checked = checked,
@@ -386,6 +390,7 @@ fun TimeBottomSheet(
             fontSize = 16.sp,
             color = descriptionColor
         )
+        Spacer(modifier = Modifier.height(16.dp))
         AppTextField(
             value = timeText,
             onValueChange = { timeText = it },
@@ -412,6 +417,7 @@ fun TimeBottomSheet(
             fontSize = 16.sp,
             color = descriptionColor
         )
+        Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             userScrollEnabled = false
@@ -444,7 +450,7 @@ fun TimeBottomSheet(
 Автор: Георгий Хасанов
 */
 @Composable
-fun TimeBottomSheet(
+fun PatientBottomSheet(
     onClose: () -> Unit,
     patientList: MutableList<User>,
     onChanged: (User) -> Unit
@@ -483,11 +489,12 @@ fun TimeBottomSheet(
                     }
             )
         }
+        Spacer(modifier = Modifier.height(24.dp))
         for ((index, u) in patientList.withIndex()) {
             Card(
                 elevation = 0.dp,
                 backgroundColor = if (index == selectedUser) primaryColor else inputColor,
-                modifier = Modifier.clickable {
+                modifier = Modifier.padding(bottom = 16.dp).clickable {
                     selectedUser = index
                 }
             ) {
@@ -510,13 +517,14 @@ fun TimeBottomSheet(
                 }
             }
         }
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         AppButton(
             text = "Добавить пациента",
             fontSize = 15.sp,
             color = primaryColor,
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-            borderStroke = BorderStroke(1.dp, primaryColor)
+            borderStroke = BorderStroke(1.dp, primaryColor),
+            modifier = Modifier.fillMaxWidth()
         ) {
             val intent = Intent(mContext, CreateCardActivity::class.java)
             mContext.startActivity(intent)
@@ -526,7 +534,8 @@ fun TimeBottomSheet(
             text = "Подтвердить",
             fontSize = 17.sp,
             fontWeight = FontWeight.W600,
-            enabled = selectedUser != -1
+            enabled = selectedUser != -1,
+            modifier = Modifier.fillMaxWidth()
         ) {
             onChanged(patientList[selectedUser])
         }

@@ -25,6 +25,7 @@ import com.example.medicmad2.R
 import com.example.medicmad2.model.CartItem
 import com.example.medicmad2.model.CatalogItem
 import com.example.medicmad2.model.NewsItem
+import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.theme.*
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -383,4 +384,16 @@ fun AppSearchItemCard(
         }
         Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(dividerColor))
     }
+}
+
+/*
+Описание: Карточка пользователя с услугами
+Дата создания: 10.03.2023 16:25
+Автор: Георгий Хасанов
+*/
+@Composable
+fun OrderUserCard(
+    user: User,
+) {
+
 }

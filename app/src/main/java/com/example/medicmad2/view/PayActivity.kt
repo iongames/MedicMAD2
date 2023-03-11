@@ -30,8 +30,10 @@ import androidx.compose.ui.unit.sp
 import com.example.medicmad2.R
 import com.example.medicmad2.common.AddressService
 import com.example.medicmad2.common.CartService
+import com.example.medicmad2.common.UserService
 import com.example.medicmad2.model.Address
 import com.example.medicmad2.model.CartItem
+import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.components.*
 import com.example.medicmad2.ui.theme.*
 import kotlinx.coroutines.launch
@@ -80,8 +82,13 @@ class PayActivity : ComponentActivity() {
 
         var cart: MutableList<CartItem> = remember { mutableStateListOf() }
         var addressList: MutableList<Address> = remember { mutableStateListOf() }
+        val userList: MutableList<User> = remember { mutableStateListOf() }
+
+        val selectedUserList: MutableList<User> = remember { mutableStateListOf() }
 
         var selectedBottomSheet by rememberSaveable { mutableStateOf(0) }
+
+        var currentEditingUser by rememberSaveable { mutableStateOf(-1) }
 
         LaunchedEffect(Unit) {
             cart.addAll(CartService().getCartData(sharedPreferences))
@@ -91,6 +98,12 @@ class PayActivity : ComponentActivity() {
             }
 
             addressList.addAll(AddressService().getAddressListData(sharedPreferences))
+            userList.addAll(UserService().getUserListData(sharedPreferences))
+
+            if (userList.isNotEmpty()) {
+                selectedUserList.add(userList[0])
+                userText = "${userList[0].lastname} ${userList[0].firstname}"
+            }
         }
 
         val scope = rememberCoroutineScope()
@@ -161,14 +174,20 @@ class PayActivity : ComponentActivity() {
                         )
                     }
                     2 -> {
-                        TimeBottomSheet(
+                        PatientBottomSheet(
                             onClose = {
                                 scope.launch {
                                     sheetState.hide()
                                 }
                             },
+                            patientList = userList,
                             onChanged = {
-                                timeText = it
+                                if (currentEditingUser != -1) {
+                                    userList.removeAt(currentEditingUser)
+                                    userList.add(currentEditingUser, it)
+
+                                    currentEditingUser = -1
+                                }
                             }
                         )
                     }
@@ -222,6 +241,7 @@ class PayActivity : ComponentActivity() {
                             color = secondaryTextColor,
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         AppTextField(
                             value = addressText,
                             onValueChange = { addressText = it},
@@ -240,6 +260,7 @@ class PayActivity : ComponentActivity() {
                             color = secondaryTextColor,
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         AppTextField(
                             value = timeText,
                             onValueChange = { timeText = it},
@@ -264,40 +285,55 @@ class PayActivity : ComponentActivity() {
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        AppTextField(
-                            value = userText,
-                            onValueChange = { userText = it },
-                            leadingIcon = {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_male),
-                                    contentDescription = "",
-                                    modifier = Modifier.size(24.dp)
-                                ) },
-                            trailingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_dropdown),
-                                    contentDescription = "",
-                                    tint = secondaryTextColor,
-                                    modifier = Modifier.clickable {
+                        if (selectedUserList.size < 2) {
+                            AppTextField(
+                                value = userText,
+                                onValueChange = { userText = it },
+                                leadingIcon = {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_male),
+                                        contentDescription = "",
+                                        modifier = Modifier.size(24.dp)
+                                    ) },
+                                trailingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_dropdown),
+                                        contentDescription = "",
+                                        tint = secondaryTextColor,
+                                        modifier = Modifier.clickable {
+                                            selectedBottomSheet = 2
 
-                                    }
-                                )
-                            },
-                            readOnly = true,
-                            placeholder = { Text(text = "Имя Фамилия", fontSize = 16.sp, color = descriptionColor) },
-                            contentPadding = PaddingValues(14.dp),
-                            interactionSource = patientInteractionSource,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp)
-                        )
+                                            currentEditingUser = 0
+
+                                            scope.launch {
+                                                sheetState.show()
+                                            }
+                                        }
+                                    )
+                                },
+                                readOnly = true,
+                                placeholder = { Text(text = "Имя Фамилия", fontSize = 16.sp, color = descriptionColor) },
+                                contentPadding = PaddingValues(14.dp),
+                                interactionSource = patientInteractionSource,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp)
+                            )
+                        } else {
+                            for (su in selectedUserList) {
+
+                            }
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                         AppButton(
                             text = "Добавить еще пациента",
                             fontSize = 15.sp,
                             color = primaryColor,
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                            borderStroke = BorderStroke(1.dp, primaryColor)
+                            borderStroke = BorderStroke(1.dp, primaryColor),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
                         ) {
                             val intent = Intent(mContext, CreateCardActivity::class.java)
                             startActivity(intent)
@@ -328,12 +364,12 @@ class PayActivity : ComponentActivity() {
                             Text(
                                 "Комментарий",
                                 fontSize = 14.sp,
-                                color = secondaryTextColor,
-                                modifier = Modifier.padding(horizontal = 20.dp)
+                                color = secondaryTextColor
                             )
                             Icon(
                                 painter = painterResource(id = R.drawable.audio),
-                                contentDescription = ""
+                                contentDescription = "",
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                         AppTextField(
