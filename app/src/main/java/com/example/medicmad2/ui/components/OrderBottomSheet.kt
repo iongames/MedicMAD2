@@ -89,7 +89,6 @@ fun AddressBottomSheet(
             onValueChange = { addressText = it},
             placeholder = { Text("Введите ваш адрес", fontSize = 15.sp) },
             contentPadding = PaddingValues(14.dp),
-            readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
         )

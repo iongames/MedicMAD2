@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 
 /*
 Описание: Класс экрана оформления заказа
-Дата создания: 10.03.2023 10:55
+Дата создания: 11.03.2023 10:55
 Автор: Георгий Хасанов
 */
 class PayActivity : ComponentActivity() {
@@ -60,7 +60,7 @@ class PayActivity : ComponentActivity() {
 
     /*
     Описание: Метод с контентом экрана оформления заказа
-    Дата создания: 10.03.2023 10:55
+    Дата создания: 11.03.2023 10:55
     Автор: Георгий Хасанов
     */
     @SuppressLint("CoroutineCreationDuringComposition")

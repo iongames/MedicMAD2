@@ -25,6 +25,15 @@
                 android:value="" />
         </activity>
         <activity
+            android:name=".view.SuccessActivity"
+            android:exported="false"
+            android:label="@string/title_activity_processing"
+            android:theme="@style/Theme.MedicMAD2">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".view.PayActivity"
             android:exported="false"
             android:label="@string/title_activity_pay"
