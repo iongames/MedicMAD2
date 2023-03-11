@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +32,7 @@ import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.theme.*
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.launch
 
 /*
 Описание: Карточка блока "Акции и новости"
@@ -349,7 +353,9 @@ fun AppSearchItemCard(
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
         ) {
             Text(
                 buildAnnotatedString {
@@ -382,7 +388,10 @@ fun AppSearchItemCard(
                 )
             }
         }
-        Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(dividerColor))
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(dividerColor))
     }
 }
 
@@ -394,6 +403,109 @@ fun AppSearchItemCard(
 @Composable
 fun OrderUserCard(
     user: User,
+    cart: MutableList<CartItem>,
+    onUserChange: (User) -> Unit,
+    onUserDelete: (User) -> Unit,
+    onCartDeleteItem: (MutableList<CartItem>) -> Unit,
+    onCartAddItem: (MutableList<CartItem>) -> Unit
 ) {
+    val userCart: MutableList<CartItem> = remember { mutableStateListOf() }
 
+    LaunchedEffect(Unit) {
+        userCart.addAll(cart)
+    }
+
+    Card(
+        elevation = 0.dp,
+        backgroundColor = Color.White,
+        border = BorderStroke(1.dp, strokeColor),
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 24.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                AppTextField(
+                    value = "${user.lastname} ${user.firstname}",
+                    onValueChange = {},
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = if (user.pol == "Мужской") R.drawable.ic_male else R.drawable.ic_female),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        ) },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_dropdown),
+                            contentDescription = "",
+                            tint = secondaryTextColor,
+                            modifier = Modifier.clickable {
+                                onUserChange(user)
+                            }
+                        )
+                    },
+                    readOnly = true,
+                    placeholder = { Text(text = "Имя Фамилия", fontSize = 16.sp, color = descriptionColor) },
+                    contentPadding = PaddingValues(14.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.75f)
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = "",
+                    tint = selectedStrokeColor,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable {
+                            onUserDelete(user)
+                        }
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            for (cartItem in cart.distinct()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(0.7f)
+                    ) {
+                        Checkbox(
+                            checked = userCart.contains(cartItem),
+                            onCheckedChange = {
+                                if (it) {
+                                    userCart.add(cartItem)
+
+                                    onCartAddItem(userCart)
+                                } else {
+                                    userCart.remove(cartItem)
+
+                                    onCartDeleteItem(userCart)
+                                }
+                            },
+                            colors = CheckboxDefaults.colors(checkedColor = primaryColor, uncheckedColor = inputColor),
+                            modifier = Modifier.clip(RoundedCornerShape(4.dp)).border(1.dp, strokeColor, RoundedCornerShape(4.dp))
+                        )
+                        Text(
+                            cartItem.name,
+                            fontSize = 12.sp,
+                            color = if (userCart.contains(cartItem)) Color.Black else descriptionColor
+                        )
+                    }
+                    Text(
+                        "${cartItem.price} ₽",
+                        fontSize = 15.sp,
+                        color = if (userCart.contains(cartItem)) Color.Black else descriptionColor
+                    )
+                }
+            }
+        }
+    }
 }
