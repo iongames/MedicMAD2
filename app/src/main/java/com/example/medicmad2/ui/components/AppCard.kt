@@ -197,6 +197,33 @@ fun AppCategoryCard(
 }
 
 /*
+Описание: Карточка времени анализов
+Дата создания: 09.03.2023 15:25
+Автор: Георгий Хасанов
+*/
+@Composable
+fun AppTimeCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    selectedItem: Boolean,
+    onClick: () -> Unit
+) {
+    Card (
+        elevation = 0.dp,
+        backgroundColor = if (selectedItem) { primaryColor } else { inputColor },
+        modifier = modifier.clickable { onClick() }
+    ){
+        Text(
+            title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.W500,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            color = if (selectedItem) { Color.White } else { secondaryTextColor }
+        )
+    }
+}
+
+/*
 Описание: Карточка товара корзины
 Дата создания: 09.03.2023 10:00
 Автор: Георгий Хасанов

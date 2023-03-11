@@ -108,7 +108,7 @@ fun AnalysisCard(
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-
+            addToCart()
         }
     }
 }
