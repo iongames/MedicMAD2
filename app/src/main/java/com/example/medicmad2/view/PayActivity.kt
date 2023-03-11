@@ -540,7 +540,8 @@ class PayActivity : ComponentActivity() {
                                 text = "Заказать",
                                 contentPadding = PaddingValues(16.dp),
                                 enabled = isEnabled,
-                                fontWeight = FontWeight.W600
+                                fontWeight = FontWeight.W600,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 val intent = Intent(mContext, ProcessingActivity::class.java)
                                 startActivity(intent)
