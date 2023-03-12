@@ -255,6 +255,7 @@ class PayActivity : ComponentActivity() {
                             modifier = Modifier.height(128.dp),
                         )
                     }
+                    Spacer(modifier = Modifier.height(40.dp))
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -322,7 +323,8 @@ class PayActivity : ComponentActivity() {
                                 text = "Заказать",
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.W600,
-                                enabled = enabled
+                                enabled = enabled,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 
                             }
