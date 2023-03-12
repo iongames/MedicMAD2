@@ -4,8 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,7 +20,9 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.medicmad2.ui.theme.inputColor
+import com.example.medicmad2.ui.theme.secondaryTextColor
 import com.example.medicmad2.ui.theme.strokeColor
 
 // Текстовое поле приложения
@@ -89,4 +90,32 @@ fun AppTextField(
             )
         }
     ))
+}
+
+// Текстовое поле на экране оплаты заказа
+@Composable
+fun OrderTextField(
+    modifier: Modifier = Modifier,
+    title: String,
+    placeholder: @Composable (() -> Unit)?,
+    value: String,
+    onValueChange: (String) -> Unit,
+    readOnly: Boolean
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            color = secondaryTextColor
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        AppTextField(
+            value = value,
+            onValueChange = onValueChange,
+            contentPadding = PaddingValues(16.dp),
+            placeholder = placeholder,
+            modifier = modifier.fillMaxWidth(),
+            readOnly = readOnly
+        )
+    }
 }

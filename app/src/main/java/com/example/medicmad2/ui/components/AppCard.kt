@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +29,7 @@ import com.example.medicmad2.R
 import com.example.medicmad2.model.CartItem
 import com.example.medicmad2.model.CatalogItem
 import com.example.medicmad2.model.NewsItem
+import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.theme.*
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -321,7 +326,9 @@ fun AppSearchItemCard(
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
         ) {
             Text(
                 buildAnnotatedString {
@@ -354,6 +361,101 @@ fun AppSearchItemCard(
                 )
             }
         }
-        Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(dividerColor))
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(dividerColor))
+    }
+}
+
+/*
+Описание: Карточка поиска товара
+Дата создания: 10.03.2023 12:00
+Автор: Георгий Хасанов
+*/
+@Composable
+fun OrderUserCard(
+    user: User,
+    cart: MutableList<CartItem>,
+    onItemAdd: (CartItem) -> Unit,
+    onItemDelete: (CartItem) -> Unit
+) {
+    Card(
+        elevation = 0.dp,
+        backgroundColor = Color.White,
+        border = BorderStroke(1.dp, strokeColor)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 24.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                AppTextField(
+                    value = "${user.lastname} ${user.firstname}",
+                    onValueChange = {},
+                    contentPadding = PaddingValues(16.dp),
+                    placeholder = { Text("") },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_male),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_dropdown),
+                            contentDescription = "",
+                            tint = secondaryTextColor
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(0.75f),
+                    readOnly = true
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = ""
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            for (item in cart.distinct()) {
+                var checked by rememberSaveable { mutableStateOf(true) }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = {
+                                checked = it
+
+                                if (it) {
+                                    onItemAdd(item)
+                                } else {
+                                    onItemDelete(item)
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = item.name,
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    }
+                    Text(
+                        text = "${item.price} ₽",
+                        fontSize = 15.sp
+                    )
+                }
+            }
+        }
     }
 }
