@@ -100,6 +100,7 @@ fun OrderTextField(
     placeholder: @Composable (() -> Unit)?,
     value: String,
     onValueChange: (String) -> Unit,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     readOnly: Boolean
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -115,6 +116,36 @@ fun OrderTextField(
             contentPadding = PaddingValues(16.dp),
             placeholder = placeholder,
             modifier = modifier.fillMaxWidth(),
+            interactionSource = interactionSource,
+            readOnly = readOnly
+        )
+    }
+}
+
+// Текстовое поле на экране выбора адреса
+@Composable
+fun AddressTextField(
+    modifier: Modifier = Modifier,
+    title: String,
+    placeholder: @Composable (() -> Unit)?,
+    value: String,
+    onValueChange: (String) -> Unit,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    readOnly: Boolean
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            color = secondaryTextColor
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        AppTextField(
+            value = value,
+            onValueChange = onValueChange,
+            contentPadding = PaddingValues(16.dp),
+            placeholder = placeholder,
+            interactionSource = interactionSource,
             readOnly = readOnly
         )
     }

@@ -1,5 +1,6 @@
 package com.example.medicmad2.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +9,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -26,8 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medicmad2.R
+import com.example.medicmad2.common.AddressService
 import com.example.medicmad2.common.CartService
 import com.example.medicmad2.common.UserService
+import com.example.medicmad2.model.Address
 import com.example.medicmad2.model.CartItem
 import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.components.*
@@ -59,6 +64,7 @@ class PayActivity : ComponentActivity() {
     Дата создания: 10.03.2023 10:55
     Автор: Георгий Хасанов
     */
+    @SuppressLint("CoroutineCreationDuringComposition")
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun PayContent() {
@@ -81,6 +87,8 @@ class PayActivity : ComponentActivity() {
         var userList: MutableList<User> = remember { mutableStateListOf() }
         var selectedUserList: MutableList<User> = remember { mutableStateListOf() }
 
+        var addressList: MutableList<Address> = remember { mutableStateListOf() }
+
         var userToChange: User? by remember { mutableStateOf(null) }
 
         var summaryCart: MutableList<CartItem> = remember { mutableStateListOf() }
@@ -88,6 +96,7 @@ class PayActivity : ComponentActivity() {
         LaunchedEffect(Unit) {
             cart.addAll(CartService().getCartData(sharedPreferences))
             userList.addAll(UserService().getUserListData(sharedPreferences))
+            addressList.addAll(AddressService().getAddressListData(sharedPreferences))
 
             summaryCart.addAll(cart)
 
@@ -104,18 +113,61 @@ class PayActivity : ComponentActivity() {
 
         var selectedBottomSheet by rememberSaveable { mutableStateOf(0) }
 
+        val addressInteractionSource = remember { MutableInteractionSource() }
+        if (addressInteractionSource.collectIsPressedAsState().value) {
+            selectedBottomSheet = 0
+
+            scope.launch {
+                sheetState.show()
+            }
+        }
+
+        val timeInteractionSource = remember { MutableInteractionSource() }
+        if (timeInteractionSource.collectIsPressedAsState().value) {
+            selectedBottomSheet = 1
+
+            scope.launch {
+                sheetState.show()
+            }
+        }
+
         ModalBottomSheetLayout(
             sheetContent = {
                 when (selectedBottomSheet) {
                     0 -> {
-                        AddressBottomSheet {
-                            scope.launch {
-                                sheetState.hide()
+                        AddressBottomSheet(
+                            onAddressSelect = {
+                                addressText = "${it.addressText}, кв.${it.flat}"
+
+                                scope.launch {
+                                    sheetState.hide()
+                                }
+                            },
+                            onAddressSave = {
+                                addressList.add(it)
+
+                                AddressService().saveAddressListData(sharedPreferences, addressList)
+
+                                scope.launch {
+                                    sheetState.hide()
+                                }
+                            },
+                            onIconClick = {
+                                scope.launch {
+                                    sheetState.hide()
+                                }
                             }
-                        }
+                        )
                     }
                     1 -> {
-                        TimeBottomSheet {
+                        TimeBottomSheet(
+                            onIconClick = {
+                                scope.launch {
+                                    sheetState.hide()
+                                }
+                            }
+                        ) {
+                            dateText = it
                             scope.launch {
                                 sheetState.hide()
                             }
@@ -209,6 +261,7 @@ class PayActivity : ComponentActivity() {
                                 placeholder = { Text("Введите ваш адрес", fontSize = 15.sp) },
                                 value = addressText,
                                 onValueChange = {},
+                                interactionSource = addressInteractionSource,
                                 readOnly = true
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -217,6 +270,7 @@ class PayActivity : ComponentActivity() {
                                 placeholder = { Text("Выберите дату и время", fontSize = 15.sp) },
                                 value = dateText,
                                 onValueChange = {},
+                                interactionSource = timeInteractionSource,
                                 readOnly = true
                             )
                             Spacer(modifier = Modifier.height(32.dp))
