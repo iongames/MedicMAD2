@@ -1,15 +1,13 @@
 package com.example.medicmad2.ui.components
 
 import android.graphics.Paint.Align
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -377,9 +375,16 @@ fun AppSearchItemCard(
 fun OrderUserCard(
     user: User,
     cart: MutableList<CartItem>,
+    summaryCart: MutableList<CartItem>,
     onItemAdd: (CartItem) -> Unit,
-    onItemDelete: (CartItem) -> Unit
+    onItemDelete: (CartItem) -> Unit,
+    onUserDelete: (User) -> Unit,
+    onUserChange: (User) -> Unit,
 ) {
+    //val patientCart: MutableList<CartItem> = remember {
+    //    mutableStateListOf()
+    //}
+
     Card(
         elevation = 0.dp,
         backgroundColor = Color.White,
@@ -410,7 +415,10 @@ fun OrderUserCard(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_dropdown),
                             contentDescription = "",
-                            tint = secondaryTextColor
+                            tint = secondaryTextColor,
+                            modifier = Modifier.clickable {
+                                onUserChange(user)
+                            }
                         )
                     },
                     modifier = Modifier.fillMaxWidth(0.75f),
@@ -418,7 +426,11 @@ fun OrderUserCard(
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.ic_close),
-                    contentDescription = ""
+                    contentDescription = "",
+                    tint = selectedStrokeColor,
+                    modifier = Modifier.clickable {
+                        onUserDelete(user)
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -428,30 +440,63 @@ fun OrderUserCard(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(0.75f)
+                    ) {
                         Checkbox(
                             checked = checked,
                             onCheckedChange = {
                                 checked = it
 
                                 if (it) {
-                                    onItemAdd(item)
+                                    val selectedIndex = summaryCart.indexOfFirst { indItem -> indItem.id == item.id }
+
+                                    if (selectedIndex != -1) {
+                                        val last = summaryCart[selectedIndex]
+                                        summaryCart.removeAt(selectedIndex)
+                                        summaryCart.add(
+                                            CartItem(
+                                                last.id,
+                                                last.name,
+                                                last.price,
+                                                last.count + 1
+                                            )
+                                        )
+                                    }
                                 } else {
-                                    onItemDelete(item)
+                                    val selectedIndex = summaryCart.indexOfFirst { indItem -> indItem.id == item.id }
+
+                                    if (selectedIndex != -1) {
+                                        val last = summaryCart[selectedIndex]
+                                        summaryCart.removeAt(selectedIndex)
+                                        summaryCart.add(
+                                            CartItem(
+                                                last.id,
+                                                last.name,
+                                                last.price,
+                                                last.count - 1
+                                            )
+                                        )
+                                    }
                                 }
-                            }
+                            },
+                            colors = CheckboxDefaults.colors(checkedColor = primaryColor, uncheckedColor = inputColor)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = item.name,
-                            color = Color.Black,
-                            fontSize = 12.sp
+                            color = if (checked) Color.Black else descriptionColor,
+                            fontSize = 12.sp,
                         )
                     }
                     Text(
                         text = "${item.price} ₽",
+                        color = if (checked) Color.Black else descriptionColor,
                         fontSize = 15.sp
                     )
                 }

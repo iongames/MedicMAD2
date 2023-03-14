@@ -3,6 +3,7 @@ package com.example.medicmad2.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -80,6 +81,8 @@ class PayActivity : ComponentActivity() {
         var userList: MutableList<User> = remember { mutableStateListOf() }
         var selectedUserList: MutableList<User> = remember { mutableStateListOf() }
 
+        var userToChange: User? by remember { mutableStateOf(null) }
+
         var summaryCart: MutableList<CartItem> = remember { mutableStateListOf() }
 
         LaunchedEffect(Unit) {
@@ -87,6 +90,10 @@ class PayActivity : ComponentActivity() {
             userList.addAll(UserService().getUserListData(sharedPreferences))
 
             summaryCart.addAll(cart)
+
+            for (i in summaryCart.distinct()) {
+                i.count = 1
+            }
 
             if (userList.isNotEmpty()) {
                 selectedUserList.add(userList[0])
@@ -101,13 +108,55 @@ class PayActivity : ComponentActivity() {
             sheetContent = {
                 when (selectedBottomSheet) {
                     0 -> {
-
+                        AddressBottomSheet {
+                            scope.launch {
+                                sheetState.hide()
+                            }
+                        }
                     }
                     1 -> {
-
+                        TimeBottomSheet {
+                            scope.launch {
+                                sheetState.hide()
+                            }
+                        }
                     }
                     2 -> {
+                        PatientBottomSheet(
+                            userList = userList,
+                            onIconClick = {
+                                scope.launch {
+                                    sheetState.hide()
+                                }
+                            }
+                        ) {
+                            if (userToChange == null) {
+                                if (!selectedUserList.contains(it)) {
+                                    selectedUserList.add(it)
 
+                                    for (item in summaryCart.distinct()) {
+                                        item.count += 1
+                                    }
+                                }
+                            } else {
+                                val userIndex = selectedUserList.indexOf(userToChange)
+
+                                if (!selectedUserList.contains(it)) {
+                                    selectedUserList.removeAt(userIndex)
+                                    selectedUserList.add(userIndex, it)
+                                }
+
+                                if (selectedUserList.size < 2) {
+                                    patientText = "${selectedUserList[0].lastname} ${selectedUserList[0].firstname}"
+                                }
+
+                                userToChange = null
+                            }
+
+                            scope.launch {
+                                sheetState.hide()
+                            }
+                        }
                     }
                 }
             },
@@ -135,18 +184,6 @@ class PayActivity : ComponentActivity() {
                                     "Оформление заказа",
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.W700
-                                )
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_remove_all),
-                                    contentDescription = "",
-                                    tint = selectedStrokeColor,
-                                    modifier = Modifier
-                                        .size(20.dp)
-                                        .clickable {
-                                            cart.clear()
-
-                                            CartService().saveCartData(sharedPreferences, cart)
-                                        }
                                 )
                             }
                         }
@@ -200,6 +237,7 @@ class PayActivity : ComponentActivity() {
                                         OrderUserCard(
                                             user = u,
                                             cart = cart,
+                                            summaryCart = summaryCart,
                                             onItemAdd = {
                                                 val selectedIndex = summaryCart.indexOf(it)
 
@@ -212,9 +250,38 @@ class PayActivity : ComponentActivity() {
 
                                                 if (selectedIndex != -1) {
                                                     summaryCart[selectedIndex].count -= 1
+
+                                                    Log.d("TAG", "PayContent: $selectedIndex ${summaryCart[selectedIndex].count}")
+                                                }
+                                            },
+                                            onUserDelete = {
+                                                val userIndex = selectedUserList.indexOf(it)
+
+                                                if (selectedUserList.contains(it)) {
+                                                    selectedUserList.removeAt(userIndex)
+                                                }
+
+                                                if (selectedUserList.size < 2) {
+                                                    patientText = "${selectedUserList[0].lastname} ${selectedUserList[0].firstname}"
+                                                }
+
+                                                for (item in summaryCart.distinct()) {
+                                                    item.count -= 1
+                                                }
+
+                                                scope.launch {
+                                                    sheetState.hide()
                                                 }
                                             }
-                                        )
+                                        ) {
+                                            userToChange = it
+
+                                            selectedBottomSheet = 2
+
+                                            scope.launch {
+                                                sheetState.show()
+                                            }
+                                        }
                                         Spacer(modifier = Modifier.height(16.dp))
                                     }
                                 } else {
@@ -240,7 +307,15 @@ class PayActivity : ComponentActivity() {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.ic_dropdown),
                                                     contentDescription = "",
-                                                    tint = secondaryTextColor
+                                                    tint = secondaryTextColor,
+                                                    modifier = Modifier.clickable {
+                                                        userToChange = selectedUserList[0]
+                                                        selectedBottomSheet = 2
+
+                                                        scope.launch {
+                                                            sheetState.show()
+                                                        }
+                                                    }
                                                 )
                                             },
                                             modifier = Modifier.fillMaxWidth(),
@@ -337,13 +412,19 @@ class PayActivity : ComponentActivity() {
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
+                                    var cartSumPrice = 0
+
+                                    for (item in summaryCart.distinct()) {
+                                        cartSumPrice += (item.price.toInt() * item.count)
+                                    }
+
                                     Text(
                                         "1 анализ",
                                         fontSize = 17.sp,
                                         fontWeight = FontWeight.W500
                                     )
                                     Text(
-                                        " ₽",
+                                        "$cartSumPrice ₽",
                                         fontSize = 17.sp,
                                         fontWeight = FontWeight.W500
                                     )

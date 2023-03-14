@@ -31,7 +31,7 @@ class UserService {
                 User(
                     id = jsonObject.get("id").asInt,
                     firstname = jsonObject.get("firstname").asString,
-                    lastname = jsonObject.get("firstname").asString,
+                    lastname = jsonObject.get("lastname").asString,
                     middlename = jsonObject.get("middlename").asString,
                     bith = jsonObject.get("bith").asString,
                     pol = jsonObject.get("pol").asString,

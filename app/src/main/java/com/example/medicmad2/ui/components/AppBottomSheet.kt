@@ -1,5 +1,6 @@
 package com.example.medicmad2.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,6 +24,7 @@ import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.theme.inputColor
 import com.example.medicmad2.ui.theme.primaryColor
 import com.example.medicmad2.ui.theme.secondaryTextColor
+import com.example.medicmad2.view.CreateCardActivity
 
 /*
 Описание: Окно с выбором адреса клиента
@@ -109,13 +112,16 @@ fun TimeBottomSheet(
 @Composable
 fun PatientBottomSheet(
     userList: MutableList<User>,
-    onIconClick: () -> Unit
+    onIconClick: () -> Unit,
+    onUserSelect: (User) -> Unit
 ) {
+    val mContext = LocalContext.current
+
     var selected: User? by remember { mutableStateOf(null) }
 
     Column(modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 20.dp)
+        .padding(horizontal = 20.dp, vertical = 24.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -142,11 +148,17 @@ fun PatientBottomSheet(
         Spacer(modifier = Modifier.height(24.dp))
         for (user in userList.distinct()) {
             Card(
-                backgroundColor = if (selected == user) primaryColor else inputColor
+                elevation = 0.dp,
+                backgroundColor = if (selected == user) primaryColor else inputColor,
+                modifier = Modifier.clickable {
+                    selected = user
+                }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
                 ) {
                     Image(
                         painter = painterResource(id = if (user.pol == "Мужской") R.drawable.ic_male else R.drawable.ic_female),
@@ -175,7 +187,19 @@ fun PatientBottomSheet(
             fontWeight = FontWeight.W400,
             modifier = Modifier.fillMaxWidth()
         ) {
-
+            val intent = Intent(mContext, CreateCardActivity::class.java)
+            mContext.startActivity(intent)
         }
+        Spacer(modifier = Modifier.height(40.dp))
+        AppButton(
+            text = "Подтвердить",
+            fontSize = 17.sp,
+            fontWeight = FontWeight.W600,
+            enabled = selected != null,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            onUserSelect(selected!!)
+        }
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
