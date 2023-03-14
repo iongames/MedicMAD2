@@ -223,7 +223,7 @@ fun AddressBottomSheet(
 @Composable
 fun TimeBottomSheet(
     onIconClick: () -> Unit,
-    onTimeSelect: (String) -> Unit
+    onTimeSelect: (String, String) -> Unit
 ) {
     val mContext = LocalContext.current
     var dateText by rememberSaveable { mutableStateOf("") }
@@ -239,6 +239,7 @@ fun TimeBottomSheet(
     )
 
     var selectedTime by rememberSaveable { mutableStateOf("") }
+    var selectedTrueTime by rememberSaveable { mutableStateOf("") }
 
     val calendar = Calendar.getInstance()
 
@@ -248,8 +249,9 @@ fun TimeBottomSheet(
 
     val datePickerDialog = DatePickerDialog(
         mContext,
-        { _, _, month: Int, day: Int ->
+        { _, year: Int, month: Int, day: Int ->
             var date = "$day $month"
+            selectedTrueTime = "$day $month $year"
 
             when (month) {
                 0 -> { date = date.replace(" 0", " января") }
@@ -360,7 +362,7 @@ fun TimeBottomSheet(
             fontWeight = FontWeight.W600,
             modifier = Modifier.fillMaxWidth()
         ) {
-            onTimeSelect("$dateText $selectedTime")
+            onTimeSelect("$dateText $selectedTime", "$selectedTrueTime $selectedTime")
         }
         Spacer(modifier = Modifier.height(32.dp))
     }

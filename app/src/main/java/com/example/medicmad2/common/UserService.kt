@@ -26,6 +26,9 @@ class UserService {
 
         jsonUserList.forEach { element ->
             val jsonObject = element.asJsonObject
+
+
+
             val jsonCart = jsonObject.get("cart").asJsonArray
 
             val cart: MutableList<CartItem> = mutableStateListOf()

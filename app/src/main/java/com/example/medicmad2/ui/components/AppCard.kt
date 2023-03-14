@@ -375,8 +375,7 @@ fun AppSearchItemCard(
 fun OrderUserCard(
     user: User,
     cart: MutableList<CartItem>,
-    onItemAdd: (CartItem) -> Unit,
-    onItemDelete: (CartItem) -> Unit,
+    onUserSave: (User) -> Unit,
     onUserDelete: (User) -> Unit,
     onUserChange: (User) -> Unit,
 ) {
@@ -459,13 +458,16 @@ fun OrderUserCard(
                                         val last = user.cart[selectedIndex]
                                         user.cart.removeAt(selectedIndex)
                                         user.cart.add(
+                                            selectedIndex,
                                             CartItem(
                                                 last.id,
                                                 last.name,
                                                 last.price,
-                                                last.count + 1
+                                                1
                                             )
                                         )
+
+                                        onUserSave(user)
                                     }
                                 } else {
                                     val selectedIndex = user.cart.indexOfFirst { indItem -> indItem.id == item.id }
@@ -474,13 +476,16 @@ fun OrderUserCard(
                                         val last = user.cart[selectedIndex]
                                         user.cart.removeAt(selectedIndex)
                                         user.cart.add(
+                                            selectedIndex,
                                             CartItem(
                                                 last.id,
                                                 last.name,
                                                 last.price,
-                                                last.count - 1
+                                                0
                                             )
                                         )
+
+                                        onUserSave(user)
                                     }
                                 }
                             },

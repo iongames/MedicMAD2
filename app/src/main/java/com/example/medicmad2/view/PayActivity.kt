@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.medicmad2.R
 import com.example.medicmad2.common.AddressService
 import com.example.medicmad2.common.CartService
@@ -37,6 +41,7 @@ import com.example.medicmad2.model.CartItem
 import com.example.medicmad2.model.User
 import com.example.medicmad2.ui.components.*
 import com.example.medicmad2.ui.theme.*
+import com.example.medicmad2.viewmodel.OrderViewModel
 import kotlinx.coroutines.launch
 
 /*
@@ -69,6 +74,8 @@ class PayActivity : ComponentActivity() {
     @Composable
     fun PayContent() {
         val mContext = LocalContext.current
+        val viewModel = ViewModelProvider(this)[OrderViewModel::class.java]
+
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true)
 
         val scope = rememberCoroutineScope()
@@ -77,11 +84,15 @@ class PayActivity : ComponentActivity() {
 
         var addressText by rememberSaveable { mutableStateOf("") }
         var dateText by rememberSaveable { mutableStateOf("") }
+        var trueDateText by rememberSaveable { mutableStateOf("") }
         var patientText by rememberSaveable { mutableStateOf("") }
         var phoneText by rememberSaveable { mutableStateOf("") }
         var commentText by rememberSaveable { mutableStateOf("") }
 
         var enabled by rememberSaveable { mutableStateOf(false) }
+
+        var isAlertDialogVisible by rememberSaveable { mutableStateOf(false) }
+        var isLoading by rememberSaveable { mutableStateOf(false) }
 
         var cart: MutableList<CartItem> = remember { mutableStateListOf() }
         var userList: MutableList<User> = remember { mutableStateListOf() }
@@ -105,6 +116,10 @@ class PayActivity : ComponentActivity() {
 
                 patientText = "${selectedUserList[0].lastname} ${selectedUserList[0].firstname}"
             }
+
+            for (su in selectedUserList) {
+                su.cart = cart
+            }
         }
 
         var selectedBottomSheet by rememberSaveable { mutableStateOf(0) }
@@ -124,6 +139,25 @@ class PayActivity : ComponentActivity() {
 
             scope.launch {
                 sheetState.show()
+            }
+        }
+
+        val response by viewModel.response.observeAsState()
+        LaunchedEffect(response) {
+            if (response == 200) {
+                val intent = Intent(mContext, SuccessActivity::class.java)
+                intent.putExtra("time", trueDateText)
+                startActivity(intent)
+            }
+
+            isLoading = false
+        }
+
+        val message by viewModel.message.observeAsState()
+        LaunchedEffect(message) {
+            if (message != null) {
+                isAlertDialogVisible = true
+                isLoading = false
             }
         }
 
@@ -162,8 +196,9 @@ class PayActivity : ComponentActivity() {
                                     sheetState.hide()
                                 }
                             }
-                        ) {
-                            dateText = it
+                        ) { date, trueDate ->
+                            dateText = date
+                            trueDateText = trueDate
                             scope.launch {
                                 sheetState.hide()
                             }
@@ -185,7 +220,8 @@ class PayActivity : ComponentActivity() {
                                     val index = selectedUserList.indexOfFirst { user -> user == it }
 
                                     if (index != -1) {
-                                        selectedUserList[index].cart = cart
+                                        selectedUserList[index].cart.clear()
+                                        selectedUserList[index].cart.addAll(cart)
                                     }
 
                                     //for (item in summaryCart.distinct()) {
@@ -200,7 +236,8 @@ class PayActivity : ComponentActivity() {
                                     selectedUserList.add(userIndex, it)
 
                                     if (userIndex != -1) {
-                                        selectedUserList[userIndex].cart = cart
+                                        selectedUserList[userIndex].cart.clear()
+                                        selectedUserList[userIndex].cart.addAll(cart)
                                     }
                                 }
 
@@ -297,31 +334,11 @@ class PayActivity : ComponentActivity() {
                                         OrderUserCard(
                                             user = u,
                                             cart = cart,
-                                            onItemAdd = {
-                                                val itemIndex = selectedUserList[userIndex].cart.indexOfFirst { cartItem -> cartItem.id == it.id }
-                                                //val selectedIndex = summaryCart.indexOf(it)
-
-                                                if (itemIndex != -1) {
-                                                    selectedUserList[userIndex].cart[itemIndex].count += 1
+                                            onUserSave = {
+                                                if (selectedUserList.contains(u)) {
+                                                    selectedUserList.removeAt(userIndex)
+                                                    selectedUserList.add(userIndex, it)
                                                 }
-
-                                                //if (selectedIndex != -1) {
-                                                //    summaryCart[selectedIndex].count += 1
-                                                //}
-                                            },
-                                            onItemDelete = {
-                                                val itemIndex = selectedUserList[userIndex].cart.indexOfFirst { cartItem -> cartItem.id == it.id }
-                                                //val selectedIndex = summaryCart.indexOf(it)
-
-                                                if (itemIndex != -1) {
-                                                    selectedUserList[userIndex].cart[itemIndex].count += 1
-                                                }
-
-                                                //if (selectedIndex != -1) {
-                                                //    summaryCart[selectedIndex].count -= 1
-
-                                                //    Log.d("TAG", "PayContent: $selectedIndex ${summaryCart[selectedIndex].count}")
-                                                //}
                                             },
                                             onUserDelete = {
                                                 val uIndex = selectedUserList.indexOf(it)
@@ -333,10 +350,6 @@ class PayActivity : ComponentActivity() {
                                                 if (selectedUserList.size < 2) {
                                                     patientText = "${selectedUserList[0].lastname} ${selectedUserList[0].firstname}"
                                                 }
-
-                                                //for (item in summaryCart.distinct()) {
-                                                //    item.count -= 1
-                                                //}
 
                                                 scope.launch {
                                                     sheetState.hide()
@@ -502,23 +515,19 @@ class PayActivity : ComponentActivity() {
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     var cartSumPrice = 0
-
                                     var cartSumAnalysis = 0
-                                    var analysisText = "анализ"
 
                                     for (u in selectedUserList.distinct()) {
-                                        for (item in u.cart) {
-                                            cartSumPrice += item.price.toInt()
+                                        for (item in u.cart.distinct()) {
+                                            cartSumPrice += item.price.toInt() * item.count
                                             cartSumAnalysis += item.count
+
+                                            Log.d("T", "PayContent: ${cartSumPrice}")
                                         }
                                     }
 
-                                    if ((cartSumAnalysis % 2 == 0 || cartSumAnalysis % 3 == 0 || cartSumAnalysis % 4 == 0) && (cartSumAnalysis % 100 != 12 || cartSumAnalysis % 100 != 13 || cartSumAnalysis % 100 != 14)) {
-                                        analysisText = "анализа"
-                                    }
-
                                     Text(
-                                        "$cartSumAnalysis $analysisText",
+                                        "$cartSumAnalysis анализ",
                                         fontSize = 17.sp,
                                         fontWeight = FontWeight.W500
                                     )
@@ -536,13 +545,36 @@ class PayActivity : ComponentActivity() {
                                     enabled = enabled,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    val intent = Intent(mContext, SuccessActivity::class.java)
-                                    startActivity(intent)
+                                    isLoading = true
+                                    viewModel.createOrder(sharedPreferences.getString("token", "").toString(), addressText, dateText, phoneText, commentText, selectedUserList)
                                 }
                             }
                         }
                     }
                 }
+            }
+        }
+
+        if (isAlertDialogVisible) {
+            AlertDialog(
+                onDismissRequest = { isAlertDialogVisible = false },
+                title = { Text("Ошибка") },
+                text = { Text(viewModel.message.value.toString()) },
+                buttons = {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)) {
+                        AppTextButton(text = "OK") {
+                            isAlertDialogVisible = false
+                        }
+                    }
+                }
+            )
+        }
+
+        if (isLoading) {
+            Dialog(onDismissRequest = {}) {
+                CircularProgressIndicator()
             }
         }
     }
