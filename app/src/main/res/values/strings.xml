@@ -9,5 +9,10 @@
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_activity_cart">CartActivity</string>
     <string name="title_activity_pay">PayActivity</string>
+<<<<<<< HEAD
     <string name="title_activity_processing">ProcessingActivity</string>
+=======
+    <string name="title_activity_success">SuccessActivity</string>
+    <string name="title_activity_info">InfoActivity</string>
+>>>>>>> Session-5
 </resources>

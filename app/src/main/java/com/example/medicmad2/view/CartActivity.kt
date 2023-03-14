@@ -112,7 +112,6 @@ class CartActivity : ComponentActivity() {
             ) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Column(
-                    verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxHeight()
                 ) {
@@ -165,18 +164,19 @@ class CartActivity : ComponentActivity() {
                                 )
                             }
                         }
-                    }
-                    AppButton(
-                        text = "Перейти к оформлению заказа",
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.W600,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                            .padding(bottom = 32.dp)
-                    ) {
-                        val intent = Intent(mContext, PayActivity::class.java)
-                        startActivity(intent)
+                        item {
+                            AppButton(
+                                text = "Перейти к оформлению заказа",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.W600,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 32.dp)
+                            ) {
+                                val intent = Intent(mContext, PayActivity::class.java)
+                                startActivity(intent)
+                            }
+                        }
                     }
                 }
             }

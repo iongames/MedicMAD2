@@ -27,15 +27,33 @@ class UserService {
         jsonUserList.forEach { element ->
             val jsonObject = element.asJsonObject
 
+
+
+            val jsonCart = jsonObject.get("cart").asJsonArray
+
+            val cart: MutableList<CartItem> = mutableStateListOf()
+
+            for (item in jsonCart) {
+                cart.add(
+                    CartItem(
+                        id = item.asJsonObject.get("id").asInt,
+                        name = item.asJsonObject.get("name").asString,
+                        price = item.asJsonObject.get("price").asString,
+                        count = item.asJsonObject.get("count").asInt
+                    )
+                )
+            }
+
             userList.add(
                 User(
                     id = jsonObject.get("id").asInt,
                     firstname = jsonObject.get("firstname").asString,
-                    lastname = jsonObject.get("firstname").asString,
+                    lastname = jsonObject.get("lastname").asString,
                     middlename = jsonObject.get("middlename").asString,
                     bith = jsonObject.get("bith").asString,
                     pol = jsonObject.get("pol").asString,
                     image = jsonObject.get("image").asString,
+                    cart = cart
                 )
             )
         }

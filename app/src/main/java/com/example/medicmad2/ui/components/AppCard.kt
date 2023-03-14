@@ -1,14 +1,20 @@
 package com.example.medicmad2.ui.components
 
 import android.graphics.Paint.Align
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+<<<<<<< HEAD
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+=======
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+>>>>>>> Session-5
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -396,14 +402,20 @@ fun AppSearchItemCard(
 }
 
 /*
+<<<<<<< HEAD
 Описание: Карточка пользователя с услугами
 Дата создания: 10.03.2023 16:25
+=======
+Описание: Карточка поиска товара
+Дата создания: 10.03.2023 12:00
+>>>>>>> Session-5
 Автор: Георгий Хасанов
 */
 @Composable
 fun OrderUserCard(
     user: User,
     cart: MutableList<CartItem>,
+<<<<<<< HEAD
     onUserChange: (User) -> Unit,
     onUserDelete: (User) -> Unit,
     onCartDeleteItem: (MutableList<CartItem>) -> Unit,
@@ -414,10 +426,20 @@ fun OrderUserCard(
     LaunchedEffect(Unit) {
         userCart.addAll(cart)
     }
+=======
+    onUserSave: (User) -> Unit,
+    onUserDelete: (User) -> Unit,
+    onUserChange: (User) -> Unit,
+) {
+    //val patientCart: MutableList<CartItem> = remember {
+    //    mutableStateListOf()
+    //}
+>>>>>>> Session-5
 
     Card(
         elevation = 0.dp,
         backgroundColor = Color.White,
+<<<<<<< HEAD
         border = BorderStroke(1.dp, strokeColor),
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.fillMaxWidth()
@@ -430,16 +452,40 @@ fun OrderUserCard(
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
+=======
+        border = BorderStroke(1.dp, strokeColor)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 24.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+>>>>>>> Session-5
             ) {
                 AppTextField(
                     value = "${user.lastname} ${user.firstname}",
                     onValueChange = {},
+<<<<<<< HEAD
                     leadingIcon = {
                         Image(
                             painter = painterResource(id = if (user.pol == "Мужской") R.drawable.ic_male else R.drawable.ic_female),
                             contentDescription = "",
                             modifier = Modifier.size(24.dp)
                         ) },
+=======
+                    contentPadding = PaddingValues(16.dp),
+                    placeholder = { Text("") },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_male),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+>>>>>>> Session-5
                     trailingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_dropdown),
@@ -450,16 +496,22 @@ fun OrderUserCard(
                             }
                         )
                     },
+<<<<<<< HEAD
                     readOnly = true,
                     placeholder = { Text(text = "Имя Фамилия", fontSize = 16.sp, color = descriptionColor) },
                     contentPadding = PaddingValues(14.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.75f)
+=======
+                    modifier = Modifier.fillMaxWidth(0.75f),
+                    readOnly = true
+>>>>>>> Session-5
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.ic_close),
                     contentDescription = "",
                     tint = selectedStrokeColor,
+<<<<<<< HEAD
                     modifier = Modifier
                         .size(20.dp)
                         .clickable {
@@ -503,6 +555,84 @@ fun OrderUserCard(
                         "${cartItem.price} ₽",
                         fontSize = 15.sp,
                         color = if (userCart.contains(cartItem)) Color.Black else descriptionColor
+=======
+                    modifier = Modifier.clickable {
+                        onUserDelete(user)
+                    }
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            for (item in cart.distinct()) {
+                var checked by rememberSaveable { mutableStateOf(true) }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(0.75f)
+                    ) {
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = {
+                                checked = it
+
+                                if (it) {
+                                    val selectedIndex = user.cart.indexOfFirst { indItem -> indItem.id == item.id }
+
+                                    if (selectedIndex != -1) {
+                                        val last = user.cart[selectedIndex]
+                                        user.cart.removeAt(selectedIndex)
+                                        user.cart.add(
+                                            selectedIndex,
+                                            CartItem(
+                                                last.id,
+                                                last.name,
+                                                last.price,
+                                                1
+                                            )
+                                        )
+
+                                        onUserSave(user)
+                                    }
+                                } else {
+                                    val selectedIndex = user.cart.indexOfFirst { indItem -> indItem.id == item.id }
+
+                                    if (selectedIndex != -1) {
+                                        val last = user.cart[selectedIndex]
+                                        user.cart.removeAt(selectedIndex)
+                                        user.cart.add(
+                                            selectedIndex,
+                                            CartItem(
+                                                last.id,
+                                                last.name,
+                                                last.price,
+                                                0
+                                            )
+                                        )
+
+                                        onUserSave(user)
+                                    }
+                                }
+                            },
+                            colors = CheckboxDefaults.colors(checkedColor = primaryColor, uncheckedColor = inputColor)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = item.name,
+                            color = if (checked) Color.Black else descriptionColor,
+                            fontSize = 12.sp,
+                        )
+                    }
+                    Text(
+                        text = "${item.price} ₽",
+                        color = if (checked) Color.Black else descriptionColor,
+                        fontSize = 15.sp
+>>>>>>> Session-5
                     )
                 }
             }

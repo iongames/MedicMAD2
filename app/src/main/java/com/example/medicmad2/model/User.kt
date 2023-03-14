@@ -1,6 +1,7 @@
 package com.example.medicmad2.model
 
 import androidx.annotation.Keep
+import androidx.compose.runtime.mutableStateListOf
 import com.google.gson.annotations.SerializedName
 
 @Keep
@@ -19,4 +20,6 @@ data class User(
     var pol: String,
     @SerializedName("image")
     var image: String,
+    @SerializedName("cart")
+    var cart: MutableList<CartItem> = mutableStateListOf()
 )

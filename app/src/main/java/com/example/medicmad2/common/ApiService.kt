@@ -2,6 +2,7 @@ package com.example.medicmad2.common
 
 import com.example.medicmad2.model.CatalogItem
 import com.example.medicmad2.model.NewsItem
+import com.example.medicmad2.model.Order
 import com.example.medicmad2.model.User
 import com.google.gson.JsonObject
 import retrofit2.Response
@@ -36,6 +37,13 @@ interface ApiService {
     )
     @PUT("updateProfile")
     suspend fun updateProfileCard(@Header("Authorization") token: String, @Body user: User): Response<JsonObject>
+
+    @Headers(
+        "accept: application/json",
+        "Content-Type: application/json"
+    )
+    @POST("order")
+    suspend fun createOrder(@Header("Authorization") token: String, @Body order: Order): Response<JsonObject>
 
     @Headers(
         "accept: application/json"

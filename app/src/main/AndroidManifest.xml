@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,9 +18,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+<<<<<<< HEAD
             android:name=".view.ProcessingActivity"
             android:exported="false"
             android:label="@string/title_activity_processing"
+=======
+            android:name=".view.InfoActivity"
+            android:exported="false"
+            android:label="@string/title_activity_info"
+>>>>>>> Session-5
             android:theme="@style/Theme.MedicMAD2">
             <meta-data
                 android:name="android.app.lib_name"
@@ -27,7 +35,11 @@
         <activity
             android:name=".view.SuccessActivity"
             android:exported="false"
+<<<<<<< HEAD
             android:label="@string/title_activity_processing"
+=======
+            android:label="@string/title_activity_success"
+>>>>>>> Session-5
             android:theme="@style/Theme.MedicMAD2">
             <meta-data
                 android:name="android.app.lib_name"
