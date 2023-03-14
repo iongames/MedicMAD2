@@ -91,16 +91,12 @@ class PayActivity : ComponentActivity() {
 
         var userToChange: User? by remember { mutableStateOf(null) }
 
-        var summaryCart: MutableList<CartItem> = remember { mutableStateListOf() }
-
         LaunchedEffect(Unit) {
             cart.addAll(CartService().getCartData(sharedPreferences))
             userList.addAll(UserService().getUserListData(sharedPreferences))
             addressList.addAll(AddressService().getAddressListData(sharedPreferences))
 
-            summaryCart.addAll(cart)
-
-            for (i in summaryCart.distinct()) {
+            for (i in cart.distinct()) {
                 i.count = 1
             }
 
@@ -186,9 +182,15 @@ class PayActivity : ComponentActivity() {
                                 if (!selectedUserList.contains(it)) {
                                     selectedUserList.add(it)
 
-                                    for (item in summaryCart.distinct()) {
-                                        item.count += 1
+                                    val index = selectedUserList.indexOfFirst { user -> user == it }
+
+                                    if (index != -1) {
+                                        selectedUserList[index].cart = cart
                                     }
+
+                                    //for (item in summaryCart.distinct()) {
+                                    //    item.count += 1
+                                    //}
                                 }
                             } else {
                                 val userIndex = selectedUserList.indexOf(userToChange)
@@ -196,6 +198,10 @@ class PayActivity : ComponentActivity() {
                                 if (!selectedUserList.contains(it)) {
                                     selectedUserList.removeAt(userIndex)
                                     selectedUserList.add(userIndex, it)
+
+                                    if (userIndex != -1) {
+                                        selectedUserList[userIndex].cart = cart
+                                    }
                                 }
 
                                 if (selectedUserList.size < 2) {
@@ -287,41 +293,50 @@ class PayActivity : ComponentActivity() {
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 if (selectedUserList.size > 1) {
-                                    for (u in selectedUserList) {
+                                    for ((userIndex, u) in selectedUserList.withIndex()) {
                                         OrderUserCard(
                                             user = u,
                                             cart = cart,
-                                            summaryCart = summaryCart,
                                             onItemAdd = {
-                                                val selectedIndex = summaryCart.indexOf(it)
+                                                val itemIndex = selectedUserList[userIndex].cart.indexOfFirst { cartItem -> cartItem.id == it.id }
+                                                //val selectedIndex = summaryCart.indexOf(it)
 
-                                                if (selectedIndex != -1) {
-                                                    summaryCart[selectedIndex].count += 1
+                                                if (itemIndex != -1) {
+                                                    selectedUserList[userIndex].cart[itemIndex].count += 1
                                                 }
+
+                                                //if (selectedIndex != -1) {
+                                                //    summaryCart[selectedIndex].count += 1
+                                                //}
                                             },
                                             onItemDelete = {
-                                                val selectedIndex = summaryCart.indexOf(it)
+                                                val itemIndex = selectedUserList[userIndex].cart.indexOfFirst { cartItem -> cartItem.id == it.id }
+                                                //val selectedIndex = summaryCart.indexOf(it)
 
-                                                if (selectedIndex != -1) {
-                                                    summaryCart[selectedIndex].count -= 1
-
-                                                    Log.d("TAG", "PayContent: $selectedIndex ${summaryCart[selectedIndex].count}")
+                                                if (itemIndex != -1) {
+                                                    selectedUserList[userIndex].cart[itemIndex].count += 1
                                                 }
+
+                                                //if (selectedIndex != -1) {
+                                                //    summaryCart[selectedIndex].count -= 1
+
+                                                //    Log.d("TAG", "PayContent: $selectedIndex ${summaryCart[selectedIndex].count}")
+                                                //}
                                             },
                                             onUserDelete = {
-                                                val userIndex = selectedUserList.indexOf(it)
+                                                val uIndex = selectedUserList.indexOf(it)
 
                                                 if (selectedUserList.contains(it)) {
-                                                    selectedUserList.removeAt(userIndex)
+                                                    selectedUserList.removeAt(uIndex)
                                                 }
 
                                                 if (selectedUserList.size < 2) {
                                                     patientText = "${selectedUserList[0].lastname} ${selectedUserList[0].firstname}"
                                                 }
 
-                                                for (item in summaryCart.distinct()) {
-                                                    item.count -= 1
-                                                }
+                                                //for (item in summaryCart.distinct()) {
+                                                //    item.count -= 1
+                                                //}
 
                                                 scope.launch {
                                                     sheetState.hide()
@@ -401,17 +416,37 @@ class PayActivity : ComponentActivity() {
                                 title = "Телефон *",
                                 placeholder = { Text("", fontSize = 15.sp) },
                                 value = phoneText,
-                                onValueChange = { phoneText = it },
+                                onValueChange = {
+                                    phoneText = it
+
+                                    enabled = addressText.isNotEmpty() && dateText.isNotEmpty() && phoneText.isNotEmpty()
+                                },
                                 readOnly = false
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            OrderTextField(
-                                title = "Комментарий *",
-                                placeholder = { Text("", fontSize = 15.sp) },
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Комментарий",
+                                    fontSize = 14.sp,
+                                    color = secondaryTextColor
+                                )
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_audio),
+                                    contentDescription = "",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            AppTextField(
                                 value = commentText,
                                 onValueChange = { commentText = it },
-                                readOnly = false,
-                                modifier = Modifier.height(128.dp),
+                                contentPadding = PaddingValues(16.dp),
+                                placeholder = { Text("Можете оставить свои пожелания", fontSize = 15.sp, color = descriptionColor) },
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                         Spacer(modifier = Modifier.height(40.dp))
@@ -468,12 +503,22 @@ class PayActivity : ComponentActivity() {
                                 ) {
                                     var cartSumPrice = 0
 
-                                    for (item in summaryCart.distinct()) {
-                                        cartSumPrice += (item.price.toInt() * item.count)
+                                    var cartSumAnalysis = 0
+                                    var analysisText = "анализ"
+
+                                    for (u in selectedUserList.distinct()) {
+                                        for (item in u.cart) {
+                                            cartSumPrice += item.price.toInt()
+                                            cartSumAnalysis += item.count
+                                        }
+                                    }
+
+                                    if ((cartSumAnalysis % 2 == 0 || cartSumAnalysis % 3 == 0 || cartSumAnalysis % 4 == 0) && (cartSumAnalysis % 100 != 12 || cartSumAnalysis % 100 != 13 || cartSumAnalysis % 100 != 14)) {
+                                        analysisText = "анализа"
                                     }
 
                                     Text(
-                                        "1 анализ",
+                                        "$cartSumAnalysis $analysisText",
                                         fontSize = 17.sp,
                                         fontWeight = FontWeight.W500
                                     )
@@ -491,7 +536,8 @@ class PayActivity : ComponentActivity() {
                                     enabled = enabled,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-
+                                    val intent = Intent(mContext, SuccessActivity::class.java)
+                                    startActivity(intent)
                                 }
                             }
                         }

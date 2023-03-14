@@ -375,7 +375,6 @@ fun AppSearchItemCard(
 fun OrderUserCard(
     user: User,
     cart: MutableList<CartItem>,
-    summaryCart: MutableList<CartItem>,
     onItemAdd: (CartItem) -> Unit,
     onItemDelete: (CartItem) -> Unit,
     onUserDelete: (User) -> Unit,
@@ -454,12 +453,12 @@ fun OrderUserCard(
                                 checked = it
 
                                 if (it) {
-                                    val selectedIndex = summaryCart.indexOfFirst { indItem -> indItem.id == item.id }
+                                    val selectedIndex = user.cart.indexOfFirst { indItem -> indItem.id == item.id }
 
                                     if (selectedIndex != -1) {
-                                        val last = summaryCart[selectedIndex]
-                                        summaryCart.removeAt(selectedIndex)
-                                        summaryCart.add(
+                                        val last = user.cart[selectedIndex]
+                                        user.cart.removeAt(selectedIndex)
+                                        user.cart.add(
                                             CartItem(
                                                 last.id,
                                                 last.name,
@@ -469,12 +468,12 @@ fun OrderUserCard(
                                         )
                                     }
                                 } else {
-                                    val selectedIndex = summaryCart.indexOfFirst { indItem -> indItem.id == item.id }
+                                    val selectedIndex = user.cart.indexOfFirst { indItem -> indItem.id == item.id }
 
                                     if (selectedIndex != -1) {
-                                        val last = summaryCart[selectedIndex]
-                                        summaryCart.removeAt(selectedIndex)
-                                        summaryCart.add(
+                                        val last = user.cart[selectedIndex]
+                                        user.cart.removeAt(selectedIndex)
+                                        user.cart.add(
                                             CartItem(
                                                 last.id,
                                                 last.name,
